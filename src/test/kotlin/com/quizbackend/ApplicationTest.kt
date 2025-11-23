@@ -104,6 +104,9 @@ class ApplicationTest {
         val responseBodyEn = getResponseEn.bodyAsText()
         assertTrue(responseBodyEn.contains("What is 2+2?"))
         assertTrue(responseBodyEn.contains("4"))
+        // Check for isCorrect field in the response (accounting for potential pretty print spacing)
+        assertTrue(responseBodyEn.contains("\"isCorrect\": true") || responseBodyEn.contains("\"isCorrect\":true"))
+        assertTrue(responseBodyEn.contains("\"isCorrect\": false") || responseBodyEn.contains("\"isCorrect\":false"))
 
         // 5. Test GET /questions with Valid Auth (Spanish)
         val getResponseEs = client.get("/questions?locale=es") {

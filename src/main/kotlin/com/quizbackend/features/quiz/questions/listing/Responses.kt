@@ -12,5 +12,6 @@ data class QuestionResponse(
 @Serializable
 data class AnswerResponse(
     val id: Int,
-    val text: String
+    val text: String,
+    val isCorrect: Boolean
 )

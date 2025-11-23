@@ -38,14 +38,23 @@ fun Route.questionsListingRoutes() {
                         .filter { it.isNotBlank() }
                         .mapNotNull { it.toIntOrNull() }
 
+                    // Parse Correct Answer IDs
+                    val correctAnswerIds = questionRow[Questions.correctAnswers]
+                        .split(",")
+                        .filter { it.isNotBlank() }
+                        .mapNotNull { it.toIntOrNull() }
+                        .toSet()
+
                     // Fetch Answers Texts for Locale
                     val answers = if (possibleAnswerIds.isNotEmpty()) {
                         AnswersLocalizations
                             .selectAll().where { (AnswersLocalizations.answerId inList possibleAnswerIds) and (AnswersLocalizations.locale eq locale) }
                             .map { answerRow ->
+                                val answerId = answerRow[AnswersLocalizations.answerId]
                                 AnswerResponse(
-                                    id = answerRow[AnswersLocalizations.answerId],
-                                    text = answerRow[AnswersLocalizations.text]
+                                    id = answerId,
+                                    text = answerRow[AnswersLocalizations.text],
+                                    isCorrect = answerId in correctAnswerIds
                                 )
                             }
                     } else {
