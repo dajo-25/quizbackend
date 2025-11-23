@@ -1,0 +1,9 @@
+services:
+  quiz-backend:
+    build: .
+    environment:
+      - STORAGE_JDBCURL=jdbc:sqlite:/data/quiz.db
+    ports:
+      - "8080:8080"
+    volumes:
+      - /data/quiz-backend/data:/data

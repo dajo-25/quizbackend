@@ -12,7 +12,10 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     configureSerialization()
-    configureDatabases() // Defaults to "jdbc:sqlite:quiz.db"
+    val jdbcUrl = System.getenv("STORAGE_JDBCURL")
+        ?: environment.config.propertyOrNull("storage.jdbcUrl")?.getString()
+        ?: "jdbc:sqlite:quiz.db"
+    configureDatabases(jdbcUrl)
     configureSecurity()
 
     routing {
