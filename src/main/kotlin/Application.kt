@@ -17,6 +17,7 @@ fun Application.module() {
         ?: "jdbc:sqlite:quiz.db"
     configureDatabases(jdbcUrl)
     configureSecurity()
+    configureSwagger()
 
     routing {
         questionsCreationRoutes()
