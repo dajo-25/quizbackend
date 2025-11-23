@@ -1,10 +1,10 @@
 package com.quizbackend.plugins
 
 import io.github.smiley4.ktoropenapi.OpenApi
+import io.github.smiley4.ktoropenapi.config.AuthScheme
+import io.github.smiley4.ktoropenapi.config.AuthType
 import io.github.smiley4.ktoropenapi.openApi
 import io.github.smiley4.ktorswaggerui.swaggerUI
-import io.github.smiley4.ktoropenapi.data.AuthType
-import io.github.smiley4.ktoropenapi.data.AuthScheme
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.routing.*
