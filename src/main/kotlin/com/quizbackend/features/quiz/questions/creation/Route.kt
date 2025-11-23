@@ -4,6 +4,7 @@ import com.quizbackend.features.localizations.models.AnswersLocalizations
 import com.quizbackend.features.localizations.models.QuestionsLocalizations
 import com.quizbackend.features.quiz.answers.models.Answers
 import com.quizbackend.features.quiz.questions.models.Questions
+import io.github.smiley4.ktoropenapi.post
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.*
@@ -16,7 +17,23 @@ import io.ktor.http.HttpStatusCode
 
 fun Route.questionsCreationRoutes() {
     authenticate("auth-bearer") {
-        post("/questions") {
+        post("/questions", {
+            description = "Create new questions with answers and localizations"
+            request {
+                body<CreateQuestionsRequest>()
+            }
+            response {
+                code(HttpStatusCode.Created) {
+                    description = "Questions created successfully"
+                }
+                code(HttpStatusCode.BadRequest) {
+                    description = "Invalid request format or data"
+                }
+                code(HttpStatusCode.InternalServerError) {
+                    description = "Server error"
+                }
+            }
+        }) {
             val request = call.receive<CreateQuestionsRequest>()
 
             try {

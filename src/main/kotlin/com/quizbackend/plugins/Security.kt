@@ -17,5 +17,17 @@ fun Application.configureSecurity() {
                 }
             }
         }
+        basic("swagger-auth") {
+            realm = "Swagger"
+            validate { credentials ->
+                val user = System.getenv("SWAGGER_USER") ?: "admin"
+                val password = System.getenv("SWAGGER_PASSWORD") ?: "admin"
+                if (credentials.name == user && credentials.password == password) {
+                    UserIdPrincipal(credentials.name)
+                } else {
+                    null
+                }
+            }
+        }
     }
 }

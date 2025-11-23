@@ -3,16 +3,36 @@ package com.quizbackend.features.quiz.questions.listing
 import com.quizbackend.features.localizations.models.AnswersLocalizations
 import com.quizbackend.features.localizations.models.QuestionsLocalizations
 import com.quizbackend.features.quiz.questions.models.Questions
+import io.github.smiley4.ktoropenapi.get
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import io.ktor.http.HttpStatusCode
 
 fun Route.questionsListingRoutes() {
     authenticate("auth-bearer") {
-        get("/questions") {
+        get("/questions", {
+            description = "List questions with pagination and localization"
+            request {
+                queryParameter<String>("locale") {
+                    description = "Locale for the questions and answers (default: en)"
+                    required = false
+                }
+                queryParameter<Int>("page") {
+                    description = "Page number (default: 1)"
+                    required = false
+                }
+            }
+            response {
+                code(HttpStatusCode.OK) {
+                    description = "List of questions"
+                    body<List<QuestionResponse>>()
+                }
+            }
+        }) {
             val locale = call.request.queryParameters["locale"] ?: "en"
             val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
             val pageSize = 10
