@@ -1,8 +1,15 @@
-ktor:
-    application:
-        modules:
-            - com.quizbackend.ApplicationKt.module
-    deployment:
-        port: 8080
 storage:
-    jdbcUrl: "jdbc:sqlite:quiz.db"
+  jdbcUrl: "jdbc:sqlite:quiz.db"
+smtp:
+  host: "INSERT_HOST"
+  port: 587
+  user: "INSERT_USER"
+  password: "INSERT_PASSWORD"
+firebase:
+  credentialsPath: "INSERT_CREDENTIALS_PATH"
+ktor:
+  application:
+    modules:
+      - com.quizbackend.ApplicationKt.module
+  deployment:
+    port: 8080

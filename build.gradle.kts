@@ -23,6 +23,9 @@ dependencies {
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.javax.mail)
+    implementation(libs.firebase.admin)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
+    testImplementation("io.ktor:ktor-client-content-negotiation:3.3.1")
 }

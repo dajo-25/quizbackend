@@ -2,8 +2,10 @@ package com.quizbackend.plugins
 
 import com.quizbackend.features.localizations.models.AnswersLocalizations
 import com.quizbackend.features.localizations.models.QuestionsLocalizations
+import com.quizbackend.features.devices.Devices
 import com.quizbackend.features.quiz.answers.models.Answers
 import com.quizbackend.features.quiz.questions.models.Questions
+import com.quizbackend.features.users.Users
 import io.ktor.server.application.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -21,7 +23,9 @@ fun Application.configureDatabases(jdbcUrl: String = "jdbc:sqlite:quiz.db") {
             Questions,
             Answers,
             QuestionsLocalizations,
-            AnswersLocalizations
+            AnswersLocalizations,
+            Users,
+            Devices
         )
     }
 }
