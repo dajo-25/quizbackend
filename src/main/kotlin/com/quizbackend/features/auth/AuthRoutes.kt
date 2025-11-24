@@ -41,7 +41,7 @@ fun Application.authRoutes(authService: AuthService) {
         route("/auth") {
             post("/signup") {
                 val req = call.receive<SignupRequest>()
-                if (authService.signup(req.email, req.username, req.name, req.surname, req.passwordHash)) {
+                if (authService.signup(req.email.uppercase(), req.username, req.name, req.surname, req.passwordHash)) {
                     call.respond(HttpStatusCode.Created, AuthResponse(message = "User created. Check email for verification."))
                 } else {
                     call.respond(HttpStatusCode.Conflict, AuthResponse(message = "User already exists"))
@@ -50,7 +50,7 @@ fun Application.authRoutes(authService: AuthService) {
 
             post("/login") {
                 val req = call.receive<LoginRequest>()
-                val token = authService.login(req.email, req.passwordHash, req.uniqueId)
+                val token = authService.login(req.email.uppercase(), req.passwordHash, req.uniqueId)
                 if (token != null) {
                     call.respond(AuthResponse(token = token))
                 } else {
@@ -60,7 +60,7 @@ fun Application.authRoutes(authService: AuthService) {
 
             post("/recover") {
                 val req = call.receive<RecoverRequest>()
-                authService.recoverPassword(req.email)
+                authService.recoverPassword(req.email.uppercase())
                 call.respond(AuthResponse(message = "If email exists, recovery email sent."))
             }
 
