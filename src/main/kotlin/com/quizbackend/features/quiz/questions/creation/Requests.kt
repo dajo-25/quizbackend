@@ -11,7 +11,9 @@ data class CreateQuestionsRequest(
 data class CreateQuestionDto(
     val localizations: List<LocalizationDto>,
     val answers: List<CreateAnswerDto>,
-    val correctAnswersIndices: List<Int> // Indices in the 'answers' list that are correct
+    val correctAnswersIndices: List<Int>, // Indices in the 'answers' list that are correct
+    val isDiscoverable: Boolean? = null, // Defaults to true if null and no private collection
+    val collectionIds: List<Int> = emptyList()
 )
 
 @Serializable

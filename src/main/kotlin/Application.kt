@@ -4,6 +4,7 @@ import com.quizbackend.features.auth.AuthService
 import com.quizbackend.features.auth.authRoutes
 import com.quizbackend.features.devices.DevicesService
 import com.quizbackend.features.devices.deviceRoutes
+import com.quizbackend.features.quiz.collections.collectionsRoutes
 import com.quizbackend.features.quiz.questions.creation.questionsCreationRoutes
 import com.quizbackend.features.quiz.questions.listing.questionsListingRoutes
 import com.quizbackend.features.users.UsersService
@@ -46,6 +47,7 @@ fun Application.module() {
     routing {
         questionsCreationRoutes()
         questionsListingRoutes()
+        collectionsRoutes()
     }
 
     authRoutes(authService)

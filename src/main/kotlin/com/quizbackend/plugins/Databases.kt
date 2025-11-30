@@ -4,6 +4,9 @@ import com.quizbackend.features.localizations.models.AnswersLocalizations
 import com.quizbackend.features.localizations.models.QuestionsLocalizations
 import com.quizbackend.features.devices.Devices
 import com.quizbackend.features.quiz.answers.models.Answers
+import com.quizbackend.features.quiz.collections.models.CollectionAccess
+import com.quizbackend.features.quiz.collections.models.CollectionQuestions
+import com.quizbackend.features.quiz.collections.models.Collections
 import com.quizbackend.features.quiz.questions.models.Questions
 import com.quizbackend.features.users.Users
 import io.ktor.server.application.*
@@ -25,7 +28,10 @@ fun Application.configureDatabases(jdbcUrl: String = "jdbc:sqlite:quiz.db") {
             QuestionsLocalizations,
             AnswersLocalizations,
             Users,
-            Devices
+            Devices,
+            Collections,
+            CollectionQuestions,
+            CollectionAccess
         )
     }
 }
