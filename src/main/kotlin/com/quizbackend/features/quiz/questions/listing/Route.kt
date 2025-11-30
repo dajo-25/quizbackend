@@ -13,6 +13,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 fun Route.questionsListingRoutes() {
     authenticate("auth-bearer") {
         get("/questions") {
+            val userId = call.principal<UserIdPrincipal>()?.name?.toIntOrNull()
             val locale = call.request.queryParameters["locale"] ?: "en"
             val page = call.request.queryParameters["page"]?.toIntOrNull() ?: 1
             val pageSize = 10
@@ -20,7 +21,10 @@ fun Route.questionsListingRoutes() {
 
             val response = transaction {
                 // Fetch questions with pagination
-                val questionsQuery = Questions.selectAll()
+                // Filter: isDiscoverable OR created by me
+                val questionsQuery = Questions
+                    .selectAll()
+                    .where { (Questions.isDiscoverable eq true) or (Questions.creatorId eq userId) }
                     .limit(pageSize, offset = offset.toLong())
 
                 questionsQuery.map { questionRow ->
