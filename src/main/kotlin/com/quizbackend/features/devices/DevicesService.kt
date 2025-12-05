@@ -63,4 +63,12 @@ class DevicesService {
             }
         }
     }
+
+    fun deletePushToken(accessToken: String) {
+        transaction {
+            Devices.update({ Devices.accessToken eq accessToken }) {
+                it[Devices.pushToken] = null
+            }
+        }
+    }
 }

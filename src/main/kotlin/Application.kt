@@ -1,16 +1,27 @@
 package com.quizbackend
 
-import com.quizbackend.features.auth.AuthService
-import com.quizbackend.features.auth.authRoutes
+import com.quizbackend.contracts.features.auth.protectedAuthRoutes
+import com.quizbackend.contracts.features.auth.publicAuthRoutes
+import com.quizbackend.contracts.features.profile.profileRoutes
+import com.quizbackend.contracts.features.collections.collectionsRoutes
+import com.quizbackend.contracts.features.communities.communitiesRoutes
+import com.quizbackend.contracts.features.marks.marksRoutes
+import com.quizbackend.contracts.features.notifications.notificationsRoutes
+import com.quizbackend.contracts.features.questions.questionsRoutes
+import com.quizbackend.features.auth.AuthContractImpl
+import com.quizbackend.features.auth.AuthDomainService
+import com.quizbackend.features.communities.CommunitiesMockContractImpl
 import com.quizbackend.features.devices.DevicesService
-import com.quizbackend.features.devices.deviceRoutes
-import com.quizbackend.features.quiz.collections.collectionsRoutes
-import com.quizbackend.features.quiz.questions.creation.questionsCreationRoutes
-import com.quizbackend.features.quiz.questions.listing.questionsListingRoutes
+import com.quizbackend.features.devices.NotificationsContractImpl
+import com.quizbackend.features.marks.MarksMockContractImpl
+import com.quizbackend.features.quiz.collections.CollectionsContractImpl
+import com.quizbackend.features.quiz.questions.QuestionsContractImpl
+import com.quizbackend.features.users.ProfileContractImpl
 import com.quizbackend.features.users.UsersService
 import com.quizbackend.plugins.*
 import com.quizbackend.services.notification.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 
 fun main(args: Array<String>) {
@@ -27,29 +38,31 @@ fun Application.module() {
     val usersService = UsersService()
     val devicesService = DevicesService()
 
-    // Notification Services
-    // In a real scenario, we would read config here to decide which impl to use.
-    // For now, using Mock implementations as default or falling back to safe defaults if config missing.
-    // To switch to real impls, one would check config properties.
-    // For the bonus requirement "Mock both for the moment. Leave it all parameterized",
-    // I'll stick to Mocks for safety unless config is explicitly present/valid (which is not for the placeholders).
     val emailSender = MockEmailSender()
-    // val emailSender = JavaxEmailSender(host, port, user, pass) // Uncomment to use real
-
     val pushSender = MockPushNotificationSender()
-    // val pushSender = FirebasePushNotificationSender(credPath) // Uncomment to use real
 
-    val authService = AuthService(usersService, devicesService, emailSender)
+    val authDomainService = AuthDomainService(usersService, devicesService, emailSender)
+    val authContractImpl = AuthContractImpl(authDomainService)
+    val profileContractImpl = ProfileContractImpl(usersService)
+    val notificationsContractImpl = NotificationsContractImpl(devicesService)
+    val questionsContractImpl = QuestionsContractImpl()
+    val collectionsContractImpl = CollectionsContractImpl()
+    val communitiesMockContractImpl = CommunitiesMockContractImpl()
+    val marksMockContractImpl = MarksMockContractImpl()
 
     configureDatabases(jdbcUrl)
     configureSecurity(devicesService)
 
     routing {
-        questionsCreationRoutes()
-        questionsListingRoutes()
-        collectionsRoutes()
+        publicAuthRoutes(authContractImpl)
+        authenticate("auth-bearer") {
+            protectedAuthRoutes(authContractImpl)
+            profileRoutes(profileContractImpl)
+            notificationsRoutes(notificationsContractImpl)
+            questionsRoutes(questionsContractImpl)
+            collectionsRoutes(collectionsContractImpl)
+            communitiesRoutes(communitiesMockContractImpl)
+            marksRoutes(marksMockContractImpl)
+        }
     }
-
-    authRoutes(authService)
-    deviceRoutes(devicesService)
 }

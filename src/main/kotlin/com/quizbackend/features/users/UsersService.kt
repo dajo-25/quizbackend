@@ -51,4 +51,14 @@ class UsersService {
             }
         }
     }
+
+    fun updateProfile(id: Int, name: String, surname: String, username: String) {
+        transaction {
+            Users.update({ Users.id eq id }) {
+                it[Users.name] = name
+                it[Users.surname] = surname
+                it[Users.username] = username
+            }
+        }
+    }
 }

@@ -10,7 +10,7 @@ import java.time.LocalDate
 import java.util.UUID
 import kotlin.random.Random
 
-class AuthService(
+class AuthDomainService(
     private val usersService: UsersService,
     private val devicesService: DevicesService,
     private val emailSender: EmailSender
