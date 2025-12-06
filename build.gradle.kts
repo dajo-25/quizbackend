@@ -24,6 +24,7 @@ dependencies {
     implementation(libs.ktor.server.auth)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
+    implementation("io.ktor:ktor-server-cors:3.3.1")
     implementation(libs.javax.mail)
     implementation(libs.firebase.admin)
     testImplementation(libs.ktor.server.test.host)
