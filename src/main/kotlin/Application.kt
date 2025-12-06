@@ -59,5 +59,6 @@ fun Application.module() {
     val devicesService = com.quizbackend.features.devices.DevicesService()
     configureSecurity(devicesService)
 
+    configureStatusPages()
     configureRouting()
 }
