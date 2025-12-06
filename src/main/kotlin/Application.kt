@@ -1,13 +1,6 @@
 package com.quizbackend
 
-import com.quizbackend.contracts.features.auth.protectedAuthRoutes
-import com.quizbackend.contracts.features.auth.publicAuthRoutes
-import com.quizbackend.contracts.features.profile.profileRoutes
-import com.quizbackend.contracts.features.collections.collectionsRoutes
-import com.quizbackend.contracts.features.communities.communitiesRoutes
-import com.quizbackend.contracts.features.marks.marksRoutes
-import com.quizbackend.contracts.features.notifications.notificationsRoutes
-import com.quizbackend.contracts.features.questions.questionsRoutes
+import com.myapp.features.auth.authRoutes
 import com.quizbackend.features.auth.AuthContractImpl
 import com.quizbackend.features.auth.AuthDomainService
 import com.quizbackend.features.communities.CommunitiesMockContractImpl
@@ -74,15 +67,6 @@ fun Application.module() {
     }
 
     routing {
-        publicAuthRoutes(authContractImpl)
-        authenticate("auth-bearer") {
-            protectedAuthRoutes(authContractImpl)
-            profileRoutes(profileContractImpl)
-            notificationsRoutes(notificationsContractImpl)
-            questionsRoutes(questionsContractImpl)
-            collectionsRoutes(collectionsContractImpl)
-            communitiesRoutes(communitiesMockContractImpl)
-            marksRoutes(marksMockContractImpl)
-        }
+        //TODO routes
     }
 }

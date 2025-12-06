@@ -1,5 +1,8 @@
 package com.quizbackend.features.auth
 
+import com.myapp.common.base.DTOResponse
+import com.myapp.common.dtos.EmptyRequestDTO
+import com.myapp.features.auth.*
 import com.quizbackend.features.devices.DevicesService
 import com.quizbackend.features.users.Users
 import com.quizbackend.features.users.UsersService
@@ -14,7 +17,7 @@ class AuthDomainService(
     private val usersService: UsersService,
     private val devicesService: DevicesService,
     private val emailSender: EmailSender
-) {
+): AuthService {
 
     fun signup(email: String, username: String, name: String, surname: String, passwordHash: String): Boolean {
         if (usersService.findByEmail(email) != null) return false
@@ -118,5 +121,41 @@ class AuthDomainService(
     private fun generateRandomPassword(): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
         return (1..8).map { chars.random() }.joinToString("")
+    }
+
+    override suspend fun Login(body: LoginRequestDTO): DTOResponse<LoginDataDTO> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun Signup(body: SignupRequestDTO): DTOResponse<SignupResponseDTO> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun Logout(body: EmptyRequestDTO): DTOResponse<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun DeleteAccount(body: EmptyRequestDTO): DTOResponse<MessageDataDTO> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun RecoverPassword(body: RecoverPasswordRequestDTO): DTOResponse<MessageDataDTO> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun VerifyEmail(body: VerifyEmailRequestDTO): DTOResponse<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun MustChangePassword(body: EmptyRequestDTO): DTOResponse<MustChangePasswordDataDTO> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun ChangePassword(body: ChangePasswordRequestDTO): DTOResponse<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun Status(body: EmptyRequestDTO): DTOResponse<UserStatusDataDTO> {
+        TODO("Not yet implemented")
     }
 }
