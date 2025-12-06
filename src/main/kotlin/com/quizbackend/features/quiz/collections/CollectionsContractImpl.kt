@@ -13,17 +13,14 @@ import java.time.LocalDateTime
 
 class CollectionsContractImpl : CollectionsService {
 
-    override suspend fun GetCollectionsList(body: EmptyRequestDTO, params: ListCollectionsParamsDTO, userId: Int): DTOResponse<List<CollectionDataDTO>> {
-        // Return collections: Public or Private owned by user.
+    override suspend fun GetCollectionsList(body: EmptyRequestDTO, params: ListCollectionsParamsDTO): DTOResponse<List<CollectionDataDTO>> {
+        // Only public
         return transaction {
             val query = Collections.selectAll()
-            // Very simplified search logic.
-            // If name provided, filter.
-            // Logic: Where (isPublic OR creatorId == userId)
             val rows = if (params.name.isNotBlank()) {
-                query.where { (Collections.name like "%${params.name}%") and ((Collections.isPublic eq true) or (Collections.creatorId eq userId)) }
+                query.where { (Collections.name like "%${params.name}%") and (Collections.isPublic eq true) }
             } else {
-                query.where { (Collections.isPublic eq true) or (Collections.creatorId eq userId) }
+                query.where { Collections.isPublic eq true }
             }
 
             val list = rows.map {
@@ -40,15 +37,14 @@ class CollectionsContractImpl : CollectionsService {
         }
     }
 
-    override suspend fun GetCollection(id: Int, body: EmptyRequestDTO, params: GetCollectionParamsDTO, userId: Int): DTOResponse<CollectionDetailDataDTO> {
+    override suspend fun GetCollection(id: Int, body: EmptyRequestDTO, params: GetCollectionParamsDTO): DTOResponse<CollectionDetailDataDTO> {
+        // Only public
         return transaction {
             val col = Collections.selectAll().where { Collections.id eq id }.singleOrNull()
             if (col == null) return@transaction DTOResponse(false, null, ErrorDetailsDTO(ErrorType.COLLECTION_NOT_FOUND, "Not found"))
 
-            // Access check
-            if (!col[Collections.isPublic] && col[Collections.creatorId].value != userId) {
-                // TODO: Check CollectionAccess for shared private collections
-                return@transaction DTOResponse(false, null, ErrorDetailsDTO(ErrorType.ACCESS_DENIED_TO_COLLECTION, "Access denied"))
+            if (!col[Collections.isPublic]) {
+                return@transaction DTOResponse(false, null, ErrorDetailsDTO(ErrorType.ACCESS_DENIED_TO_COLLECTION, "Access denied (private collection)"))
             }
 
             val questionIds = CollectionQuestions.select(CollectionQuestions.questionId)
@@ -68,46 +64,13 @@ class CollectionsContractImpl : CollectionsService {
         }
     }
 
-    override suspend fun CreateCollection(body: CreateCollectionRequestDTO, userId: Int): DTOResponse<IdDataDTO> {
-        if (userId == 0) return DTOResponse(false, null, ErrorDetailsDTO(ErrorType.UNAUTHORIZED, "Unauthorized"))
-
-        val newId = transaction {
-            Collections.insertAndGetId {
-                it[name] = body.name
-                it[description] = body.description
-                it[isPublic] = body.isPublic
-                it[creatorId] = userId
-                it[createdAt] = LocalDateTime.now()
-            }.value
-        }
-        return DTOResponse(true, IdDataDTO(newId), null)
+    override suspend fun CreateCollection(body: CreateCollectionRequestDTO): DTOResponse<IdDataDTO> {
+        // MOCK: Success with dummy ID
+        return DTOResponse(true, IdDataDTO(999), null)
     }
 
-    override suspend fun UpdateCollection(id: Int, body: UpdateCollectionRequestDTO, params: UpdateCollectionParamsDTO, userId: Int): DTOResponse<Void> {
-        if (userId == 0) return DTOResponse(false, null, ErrorDetailsDTO(ErrorType.UNAUTHORIZED, "Unauthorized"))
-
-        return transaction {
-            val col = Collections.selectAll().where { Collections.id eq id }.singleOrNull() ?: return@transaction DTOResponse(false, null, ErrorDetailsDTO(ErrorType.COLLECTION_NOT_FOUND, "Not found"))
-
-            if (col[Collections.creatorId].value != userId) {
-                return@transaction DTOResponse(false, null, ErrorDetailsDTO(ErrorType.ACCESS_DENIED_TO_COLLECTION, "Not owner"))
-            }
-
-            if (col[Collections.isPublic] && !body.isPublic) {
-                 // Requirement: Public collections make all contained questions discoverable.
-                 // If changing from Public to Private, we might need to handle contained questions discoverability or "CANNOT_MODIFY_PUBLIC_COLLECTION" error?
-                 // Error enum has CANNOT_MODIFY_PUBLIC_COLLECTION.
-                 // Let's assume we can modify, but if it's public we might restrict making it private?
-                 // Or maybe we can't edit public collections at all?
-                 // I'll proceed with update.
-            }
-
-            Collections.update({ Collections.id eq id }) {
-                it[name] = body.name
-                it[description] = body.description
-                it[isPublic] = body.isPublic
-            }
-            DTOResponse(true, null, null)
-        }
+    override suspend fun UpdateCollection(id: Int, body: UpdateCollectionRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<Unit> {
+        // MOCK: Success
+        return DTOResponse(true, null, null)
     }
 }

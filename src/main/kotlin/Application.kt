@@ -1,23 +1,9 @@
 package com.quizbackend
 
-import com.myapp.features.auth.authRoutes
-import com.quizbackend.features.auth.AuthContractImpl
-import com.quizbackend.features.auth.AuthDomainService
-import com.quizbackend.features.communities.CommunitiesMockContractImpl
-import com.quizbackend.features.devices.DevicesService
-import com.quizbackend.features.devices.NotificationsContractImpl
-import com.quizbackend.features.marks.MarksMockContractImpl
-import com.quizbackend.features.quiz.collections.CollectionsContractImpl
-import com.quizbackend.features.quiz.questions.QuestionsContractImpl
-import com.quizbackend.features.users.ProfileContractImpl
-import com.quizbackend.features.users.UsersService
 import com.quizbackend.plugins.*
-import com.quizbackend.services.notification.*
 import io.ktor.http.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
 import io.ktor.server.plugins.cors.routing.*
-import io.ktor.server.routing.*
 
 fun main(args: Array<String>) {
     io.ktor.server.netty.EngineMain.main(args)
@@ -29,44 +15,49 @@ fun Application.module() {
         ?: environment.config.propertyOrNull("storage.jdbcUrl")?.getString()
         ?: "jdbc:sqlite:quiz.db"
 
-    // Services Initialization
-    val usersService = UsersService()
-    val devicesService = DevicesService()
-
-    val emailSender = MockEmailSender()
-    val pushSender = MockPushNotificationSender()
-
-    val authDomainService = AuthDomainService(usersService, devicesService, emailSender)
-    val authContractImpl = AuthContractImpl(authDomainService)
-    val profileContractImpl = ProfileContractImpl(usersService)
-    val notificationsContractImpl = NotificationsContractImpl(devicesService)
-    val questionsContractImpl = QuestionsContractImpl()
-    val collectionsContractImpl = CollectionsContractImpl()
-    val communitiesMockContractImpl = CommunitiesMockContractImpl()
-    val marksMockContractImpl = MarksMockContractImpl()
-
     configureDatabases(jdbcUrl)
-    configureSecurity(devicesService)
+    // Security and Routing are now configured in separate functions/extensions
+    // which are likely called from here or I should call them.
+    // Wait, Routing.kt has configureRouting().
+    // I should call configureRouting().
+    // I need to check how to configure Security. `configureSecurity(devicesService)`.
+    // I need to instantiate devicesService here to pass it to security?
+    // Or I can move security config to Routing or similar?
+    // The previous code had `configureSecurity(devicesService)`.
+
+    // I will replicate the necessary setup but using the new Routing.kt logic if possible.
+    // Actually, Routing.kt defined `configureRouting()`.
+    // I should call it.
+
+    // But `configureSecurity` depends on `devicesService`.
+    // And `configureRouting` (my version) instantiates its own services.
+    // This creates double instantiation.
+    // I should probably move dependency injection to `module` and pass instances to `configureRouting`.
+
+    // Let's modify `Routing.kt` to accept instances or `Application.configureRouting` should use what's available?
+    // `Routing.kt` is an extension on `Application`.
+
+    // Simplest: Instantiate common services here, pass to configureSecurity.
+    // Then call configureRouting().
+    // NOTE: `configureRouting` in my overwritten file creates its own instances. This is fine for now (stateless or DB-backed services).
+    // `DevicesService` is DB backed, so separate instances are fine.
+
+    // I just need to import DevicesService for configureSecurity.
+
     install(CORS) {
-        // 1. Mètodes permesos (GET, POST i HEAD venen per defecte)
         allowMethod(HttpMethod.Options)
         allowMethod(HttpMethod.Put)
         allowMethod(HttpMethod.Delete)
-
-        // 2. Capçaleres permeses (si envies JSON o Tokens)
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.Authorization)
-
-        // 3. Permetre credencials (Cookies / Auth headers)
         allowCredentials = true
-
-        // 4. Host específic (Sense "http://", només domini i port)
-        // scheme: llista els protocols (http, https)
         allowHost("localhost:5500", schemes = listOf("http", "https"))
         allowHost("sks0s0kg8cgw8kwg4skoocwg.reservarum.com", schemes = listOf("https"))
     }
 
-    routing {
-        //TODO routes
-    }
+    // Create service for Security
+    val devicesService = com.quizbackend.features.devices.DevicesService()
+    configureSecurity(devicesService)
+
+    configureRouting()
 }
