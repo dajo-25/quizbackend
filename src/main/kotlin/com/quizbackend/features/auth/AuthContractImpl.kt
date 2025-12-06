@@ -24,7 +24,12 @@ class AuthContractImpl(
     override suspend fun Signup(body: SignupRequestDTO): DTOResponse<SignupResponseDTO> {
         val success = authDomainService.signup(body.email.uppercase(), body.username, body.name, body.surname, body.passwordHash)
         return if (success) {
-            DTOResponse(true, SignupResponseDTO(""), null)
+            val token = authDomainService.login(body.email.uppercase(), body.passwordHash, body.uniqueDeviceId)
+            if (token != null) {
+                DTOResponse(true, SignupResponseDTO(token), null)
+            } else {
+                DTOResponse(false, null, ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, "Signup successful but login failed"))
+            }
         } else {
             DTOResponse(false, null, ErrorDetailsDTO(ErrorType.ACCOUNT_ALREADY_EXISTS, "User already exists"))
         }
