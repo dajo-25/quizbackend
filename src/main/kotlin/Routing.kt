@@ -17,9 +17,13 @@ import com.quizbackend.services.notification.MockEmailSender
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import io.ktor.serialization.JsonConvertException
+import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.MissingFieldException
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
@@ -128,7 +132,26 @@ fun <Body : Any, Params : DTOParams, Response : Any> Route.configureRoute(
                     call.respond(HttpStatusCode.BadRequest, response, io.ktor.util.reflect.TypeInfo(def.returnType.classifier as KClass<*>, def.returnType))
                 }
             } catch (e: Exception) {
-                call.respond(HttpStatusCode.BadRequest, DTOResponse<Unit>(false, null, "Error: ${e.localizedMessage}", ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, e.message)))
+                val errorDetails = when {
+                    e is BadRequestException && e.cause is MissingFieldException -> {
+                        val cause = e.cause as MissingFieldException
+                        ErrorDetailsDTO(ErrorType.MISSING_DATA, "Missing field(s): ${cause.missingFields.joinToString(", ")}")
+                    }
+                    e is BadRequestException && e.cause is SerializationException -> {
+                        ErrorDetailsDTO(ErrorType.MISSING_DATA, "Invalid format or type: ${e.cause?.message}")
+                    }
+                    e is BadRequestException && e.cause is JsonConvertException -> {
+                        ErrorDetailsDTO(ErrorType.MISSING_DATA, "Invalid format or type: ${e.cause?.message}")
+                    }
+                    e is IllegalArgumentException -> {
+                        // This catches our custom exceptions from parseParams
+                        ErrorDetailsDTO(ErrorType.MISSING_DATA, e.message ?: "Invalid data")
+                    }
+                    else -> {
+                        ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, e.message)
+                    }
+                }
+                call.respond(HttpStatusCode.BadRequest, DTOResponse<Unit>(false, null, "Error: ${errorDetails.message}", errorDetails))
             }
         }
     }
@@ -154,7 +177,13 @@ fun <Params : DTOParams> parseParams(call: ApplicationCall, type: KClass<Params>
     val args = constructor.parameters.associateWith { param ->
         val value = call.parameters[param.name!!]
         // Convert value to type
-        convertValue(value, param.type.classifier as KClass<*>)
+        try {
+            convertValue(value, param.type.classifier as KClass<*>)
+        } catch (e: NumberFormatException) {
+            throw IllegalArgumentException("Parameter '${param.name}' must be a number", e)
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Parameter '${param.name}' is invalid: ${e.message}", e)
+        }
     }
     return constructor.callBy(args)
 }
