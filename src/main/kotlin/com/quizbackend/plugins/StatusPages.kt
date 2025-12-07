@@ -1,7 +1,7 @@
 package com.quizbackend.plugins
 
-import com.quizbackend.contracts.common.errors.ErrorDetailsDTO
-import com.quizbackend.contracts.common.errors.ErrorType
+import com.quizbackend.contracts.common.base.ErrorDetailsDTO
+import com.quizbackend.contracts.common.base.ErrorType
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
