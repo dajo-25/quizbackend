@@ -1,0 +1,93 @@
+{
+  "specificationName": "Custom API Contract Specification",
+  "version": "1.0.0",
+  "description": "Defines the structure for the API contract JSON file used to automate frontend-backend communication code generation.",
+  "root": {
+    "type": "object",
+    "required": ["routes", "dtos", "enums"],
+    "properties": {
+      "routes": {
+        "type": "array",
+        "description": "List of all API endpoints.",
+        "items": { "$ref": "#/definitions/Route" }
+      },
+      "dtos": {
+        "type": "object",
+        "description": "Dictionary of Data Transfer Objects. Key is the DTO class name.",
+        "additionalProperties": { "$ref": "#/definitions/DTO" }
+      },
+      "enums": {
+        "type": "object",
+        "description": "Dictionary of Enumerations. Key is the Enum name.",
+        "additionalProperties": { "$ref": "#/definitions/Enum" }
+      }
+    }
+  },
+  "definitions": {
+    "Route": {
+      "type": "object",
+      "required": ["method", "path", "bodyType", "paramsType", "responseType", "requiresAuth"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]
+        },
+        "path": {
+          "type": "string",
+          "description": "The URL path. Parameters are enclosed in braces, e.g., /users/{id}."
+        },
+        "bodyType": {
+          "type": "string",
+          "description": "The name of the DTO used for the request body. Use 'EmptyRequestDTO' if none."
+        },
+        "paramsType": {
+          "type": "string",
+          "description": "The name of the DTO used for query and path parameters."
+        },
+        "responseType": {
+          "type": "string",
+          "description": "The name of the inner DTO returned on success. The actual API response is wrapped in a generic standard response object."
+        },
+        "requiresAuth": {
+          "type": "boolean",
+          "description": "Indicates if the endpoint requires an authorization token."
+        }
+      }
+    },
+    "DTO": {
+      "type": "object",
+      "properties": {
+        "inherits": {
+          "type": "string",
+          "description": "Name of the parent class, if any (e.g., 'DTOParams').",
+          "nullable": true
+        },
+        "properties": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Property" }
+        }
+      }
+    },
+    "Property": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": {
+            "type": "string",
+            "description": "Kotlin-like type signature (e.g., 'String', 'Int', 'List<String>', 'MyCustomDTO')."
+        },
+        "isNullable": { "type": "boolean", "default": false }
+      }
+    },
+    "Enum": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
