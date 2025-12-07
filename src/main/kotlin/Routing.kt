@@ -123,9 +123,9 @@ fun <Body : Any, Params : DTOParams, Response : Any> Route.configureRoute(
 
                 // Respond
                 if (response.success) {
-                    call.respond(HttpStatusCode.OK, response, io.ktor.util.reflect.TypeInfo(def.returnType, def.returnType.classifier as KClass<*>))
+                    call.respond(HttpStatusCode.OK, response, io.ktor.util.reflect.TypeInfo(def.returnType.classifier as KClass<*>, def.returnType))
                 } else {
-                    call.respond(HttpStatusCode.BadRequest, response, io.ktor.util.reflect.TypeInfo(def.returnType, def.returnType.classifier as KClass<*>))
+                    call.respond(HttpStatusCode.BadRequest, response, io.ktor.util.reflect.TypeInfo(def.returnType.classifier as KClass<*>, def.returnType))
                 }
             } catch (e: Exception) {
                 call.respond(HttpStatusCode.BadRequest, DTOResponse<Unit>(false, null, "Error: ${e.localizedMessage}", ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, e.message)))
