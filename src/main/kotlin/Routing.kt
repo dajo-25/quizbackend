@@ -47,46 +47,46 @@ fun Application.configureRouting() {
 
     val routes = listOf(
         // AUTH
-        defineRoute(HttpMethod.Post, "/auth/login") { body: LoginRequestDTO, _: EmptyParams -> authService.Login(body) },
-        defineRoute(HttpMethod.Post, "/auth/signup") { body: SignupRequestDTO, _: EmptyParams -> authService.Signup(body) },
-        defineRoute(HttpMethod.Post, "/auth/logout", requiresAuth = true) { body: EmptyRequestDTO, _: EmptyParams -> authService.Logout(body) },
-        defineRoute(HttpMethod.Delete, "/auth/account", requiresAuth = true) { body: EmptyRequestDTO, _: EmptyParams -> authService.DeleteAccount(body) },
-        defineRoute(HttpMethod.Post, "/auth/recover") { body: RecoverPasswordRequestDTO, _: EmptyParams -> authService.RecoverPassword(body) },
-        defineRoute(HttpMethod.Post, "/auth/verify") { body: VerifyEmailRequestDTO, _: EmptyParams -> authService.VerifyEmail(body) },
-        defineRoute(HttpMethod.Get, "/auth/must-change-password", requiresAuth = true) { body: EmptyRequestDTO, _: EmptyParams -> authService.MustChangePassword(body) },
-        defineRoute(HttpMethod.Post, "/auth/change-password", requiresAuth = true) { body: ChangePasswordRequestDTO, _: EmptyParams -> authService.ChangePassword(body) },
-        defineRoute(HttpMethod.Get, "/auth/status", requiresAuth = true) { body: EmptyRequestDTO, _: EmptyParams -> authService.Status(body) },
+        defineRoute<LoginRequestDTO, EmptyParams, LoginResponse>(HttpMethod.Post, "/auth/login") { body, _ -> authService.Login(body) },
+        defineRoute<SignupRequestDTO, EmptyParams, GenericResponse>(HttpMethod.Post, "/auth/signup") { body, _ -> authService.Signup(body) },
+        defineRoute<EmptyRequestDTO, EmptyParams, GenericResponse>(HttpMethod.Post, "/auth/logout", requiresAuth = true) { body, _ -> authService.Logout(body) },
+        defineRoute<EmptyRequestDTO, EmptyParams, MessageResponse>(HttpMethod.Delete, "/auth/account", requiresAuth = true) { body, _ -> authService.DeleteAccount(body) },
+        defineRoute<RecoverPasswordRequestDTO, EmptyParams, MessageResponse>(HttpMethod.Post, "/auth/recover") { body, _ -> authService.RecoverPassword(body) },
+        defineRoute<VerifyEmailRequestDTO, EmptyParams, GenericResponse>(HttpMethod.Post, "/auth/verify") { body, _ -> authService.VerifyEmail(body) },
+        defineRoute<EmptyRequestDTO, EmptyParams, MustChangePasswordResponse>(HttpMethod.Get, "/auth/must-change-password", requiresAuth = true) { body, _ -> authService.MustChangePassword(body) },
+        defineRoute<ChangePasswordRequestDTO, EmptyParams, GenericResponse>(HttpMethod.Post, "/auth/change-password", requiresAuth = true) { body, _ -> authService.ChangePassword(body) },
+        defineRoute<EmptyRequestDTO, EmptyParams, UserStatusResponse>(HttpMethod.Get, "/auth/status", requiresAuth = true) { body, _ -> authService.Status(body) },
 
         // QUESTIONS
-        defineRoute(HttpMethod.Get, "/questions") { body: EmptyRequestDTO, params: SearchQuestionsParamsDTO -> questionsService.DiscoverQuestions(body, params) },
-        defineRoute(HttpMethod.Post, "/questions", requiresAuth = true) { body: CreateQuestionsRequestDTO, _: EmptyParams -> questionsService.CreateQuestions(body) },
-        defineRoute(HttpMethod.Get, "/questions/{id}") { body: EmptyRequestDTO, params: GetQuestionParamsDTO -> questionsService.GetQuestion(body, params) },
-        defineRoute(HttpMethod.Put, "/questions/{id}", requiresAuth = true) { body: UpdateQuestionRequestDTO, params: UpdateQuestionParamsDTO -> questionsService.UpdateQuestion(body, params) },
-        defineRoute(HttpMethod.Delete, "/questions/{id}", requiresAuth = true) { body: EmptyRequestDTO, params: DeleteQuestionParamsDTO -> questionsService.DeleteQuestion(body, params) },
-        defineRoute(HttpMethod.Get, "/questions/batch") { body: EmptyRequestDTO, params: GetQuestionsBatchParamsDTO -> questionsService.GetQuestionsBatch(body, params) },
+        defineRoute<EmptyRequestDTO, SearchQuestionsParamsDTO, QuestionListResponse>(HttpMethod.Get, "/questions") { body, params -> questionsService.DiscoverQuestions(body, params) },
+        defineRoute<CreateQuestionsRequestDTO, EmptyParams, GenericResponse>(HttpMethod.Post, "/questions", requiresAuth = true) { body, _ -> questionsService.CreateQuestions(body) },
+        defineRoute<EmptyRequestDTO, GetQuestionParamsDTO, QuestionDataResponse>(HttpMethod.Get, "/questions/{id}") { body, params -> questionsService.GetQuestion(body, params) },
+        defineRoute<UpdateQuestionRequestDTO, UpdateQuestionParamsDTO, QuestionDataResponse>(HttpMethod.Put, "/questions/{id}", requiresAuth = true) { body, params -> questionsService.UpdateQuestion(body, params) },
+        defineRoute<EmptyRequestDTO, DeleteQuestionParamsDTO, GenericResponse>(HttpMethod.Delete, "/questions/{id}", requiresAuth = true) { body, params -> questionsService.DeleteQuestion(body, params) },
+        defineRoute<EmptyRequestDTO, GetQuestionsBatchParamsDTO, QuestionListResponse>(HttpMethod.Get, "/questions/batch") { body, params -> questionsService.GetQuestionsBatch(body, params) },
 
         // COLLECTIONS
-        defineRoute(HttpMethod.Get, "/collections") { body: EmptyRequestDTO, _: EmptyParams -> collectionsService.GetCollectionsList(body) },
-        defineRoute(HttpMethod.Post, "/collections", requiresAuth = true) { body: CreateCollectionRequestDTO, _: EmptyParams -> collectionsService.CreateCollection(body) },
-        defineRoute(HttpMethod.Get, "/collections/{id}") { body: EmptyRequestDTO, params: UpdateCollectionParamsDTO -> collectionsService.GetCollection(body, params) },
-        defineRoute(HttpMethod.Put, "/collections/{id}", requiresAuth = true) { body: UpdateCollectionRequestDTO, params: UpdateCollectionParamsDTO -> collectionsService.UpdateCollection(body, params) },
-        defineRoute(HttpMethod.Delete, "/collections/{id}", requiresAuth = true) { body: EmptyRequestDTO, params: UpdateCollectionParamsDTO -> collectionsService.DeleteCollection(body, params) },
+        defineRoute<EmptyRequestDTO, EmptyParams, CollectionListResponse>(HttpMethod.Get, "/collections") { body, _ -> collectionsService.GetCollectionsList(body) },
+        defineRoute<CreateCollectionRequestDTO, EmptyParams, IdDataResponse>(HttpMethod.Post, "/collections", requiresAuth = true) { body, _ -> collectionsService.CreateCollection(body) },
+        defineRoute<EmptyRequestDTO, UpdateCollectionParamsDTO, CollectionDetailResponse>(HttpMethod.Get, "/collections/{id}") { body, params -> collectionsService.GetCollection(body, params) },
+        defineRoute<UpdateCollectionRequestDTO, UpdateCollectionParamsDTO, GenericResponse>(HttpMethod.Put, "/collections/{id}", requiresAuth = true) { body, params -> collectionsService.UpdateCollection(body, params) },
+        defineRoute<EmptyRequestDTO, UpdateCollectionParamsDTO, GenericResponse>(HttpMethod.Delete, "/collections/{id}", requiresAuth = true) { body, params -> collectionsService.DeleteCollection(body, params) },
 
         // COMMUNITIES
-        defineRoute(HttpMethod.Post, "/communities/friend-request", requiresAuth = true) { body: SendFriendRequestDTO, _: EmptyParams -> communitiesService.SendFriendRequest(body) },
-        defineRoute(HttpMethod.Post, "/communities/friend-request/respond", requiresAuth = true) { body: EmptyRequestDTO, _: EmptyParams -> communitiesService.RespondFriendRequest(body) },
-        defineRoute(HttpMethod.Get, "/communities/users", requiresAuth = true) { body: EmptyRequestDTO, _: EmptyParams -> communitiesService.SearchUsers(body) },
+        defineRoute<SendFriendRequestDTO, EmptyParams, FriendRequestResponse>(HttpMethod.Post, "/communities/friend-request", requiresAuth = true) { body, _ -> communitiesService.SendFriendRequest(body) },
+        defineRoute<EmptyRequestDTO, EmptyParams, GenericResponse>(HttpMethod.Post, "/communities/friend-request/respond", requiresAuth = true) { body, _ -> communitiesService.RespondFriendRequest(body) },
+        defineRoute<EmptyRequestDTO, EmptyParams, UserListResponse>(HttpMethod.Get, "/communities/users", requiresAuth = true) { body, _ -> communitiesService.SearchUsers(body) },
 
         // MARKS
-        defineRoute(HttpMethod.Get, "/marks", requiresAuth = true) { body: EmptyRequestDTO, _: EmptyParams -> marksService.GetMarks(body) },
+        defineRoute<EmptyRequestDTO, EmptyParams, MarkListResponse>(HttpMethod.Get, "/marks", requiresAuth = true) { body, _ -> marksService.GetMarks(body) },
 
         // NOTIFICATIONS
-        defineRoute(HttpMethod.Post, "/devices/push-token", requiresAuth = true) { body: RegisterPushTokenRequestDTO, _: EmptyParams -> notificationsService.RegisterPushToken(body) },
-        defineRoute(HttpMethod.Delete, "/devices/push-token", requiresAuth = true) { body: EmptyRequestDTO, _: EmptyParams -> notificationsService.UnregisterPushToken(body) },
+        defineRoute<RegisterPushTokenRequestDTO, EmptyParams, GenericResponse>(HttpMethod.Post, "/devices/push-token", requiresAuth = true) { body, _ -> notificationsService.RegisterPushToken(body) },
+        defineRoute<EmptyRequestDTO, EmptyParams, GenericResponse>(HttpMethod.Delete, "/devices/push-token", requiresAuth = true) { body, _ -> notificationsService.UnregisterPushToken(body) },
 
         // PROFILE
-        defineRoute(HttpMethod.Get, "/profile", requiresAuth = true) { body: EmptyRequestDTO, _: EmptyParams -> profileService.SeeProfile(body) },
-        defineRoute(HttpMethod.Put, "/profile", requiresAuth = true) { body: UpdateProfileRequestDTO, _: EmptyParams -> profileService.UpdateProfile(body) }
+        defineRoute<EmptyRequestDTO, EmptyParams, ProfileDataResponse>(HttpMethod.Get, "/profile", requiresAuth = true) { body, _ -> profileService.SeeProfile(body) },
+        defineRoute<UpdateProfileRequestDTO, EmptyParams, ProfileDataResponse>(HttpMethod.Put, "/profile", requiresAuth = true) { body, _ -> profileService.UpdateProfile(body) }
     )
 
     routing {
