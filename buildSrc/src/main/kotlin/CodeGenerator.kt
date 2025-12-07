@@ -30,6 +30,215 @@ open class GenerateContractTask : DefaultTask() {
         // Generate Services & Routes
         val routes = json["routes"]?.jsonArray ?: emptyList()
         generateServicesAndRoutes(outputDir, routes)
+
+        // Generate OpenAPI
+        generateOpenApi(projectDir, json)
+    }
+
+    private fun generateOpenApi(projectDir: File, json: JsonObject) {
+        val dtos = json["dtos"]?.jsonObject ?: emptyMap()
+        val enums = json["enums"]?.jsonObject ?: emptyMap()
+        val routes = json["routes"]?.jsonArray ?: emptyList()
+
+        val openApi = buildJsonObject {
+            put("openapi", "3.0.0")
+            putJsonObject("info") {
+                put("title", json["specificationName"]?.jsonPrimitive?.content ?: "API")
+                put("version", json["version"]?.jsonPrimitive?.content ?: "1.0.0")
+            }
+
+            putJsonObject("paths") {
+                val routesByPath = routes.groupBy { it.jsonObject["path"]!!.jsonPrimitive.content }
+
+                routesByPath.forEach { (path, routeList) ->
+                    putJsonObject(path) {
+                        routeList.forEach { routeElement ->
+                            val route = routeElement.jsonObject
+                            val method = route["method"]!!.jsonPrimitive.content.lowercase()
+                            val bodyType = route["bodyType"]!!.jsonPrimitive.content
+                            val paramsType = route["paramsType"]!!.jsonPrimitive.content
+                            val responseType = route["responseType"]!!.jsonPrimitive.content
+                            val requiresAuth = route["requiresAuth"]?.jsonPrimitive?.boolean ?: false
+
+                            putJsonObject(method) {
+                                put("operationId", generateOperationId(method, path))
+
+                                if (requiresAuth) {
+                                    putJsonArray("security") {
+                                        addJsonObject {
+                                            putJsonArray("bearerAuth") {}
+                                        }
+                                    }
+                                }
+
+                                // Parameters
+                                val paramsList = buildJsonArray {
+                                    val paramDto = dtos[paramsType]?.jsonObject
+                                    if (paramDto != null) {
+                                        val properties = paramDto["properties"]?.jsonArray ?: emptyList()
+                                        properties.forEach { prop ->
+                                            val p = prop.jsonObject
+                                            val pName = p["name"]!!.jsonPrimitive.content
+                                            val pType = p["type"]!!.jsonPrimitive.content
+                                            val isNullable = p["isNullable"]?.jsonPrimitive?.boolean == true
+
+                                            val isPath = path.contains("{$pName}")
+                                            val paramIn = if (isPath) "path" else "query"
+
+                                            addJsonObject {
+                                                put("name", pName)
+                                                put("in", paramIn)
+                                                put("required", isPath || !isNullable)
+                                                putJsonObject("schema") {
+                                                    fillTypeSchema(pType)
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (paramsList.isNotEmpty()) {
+                                    put("parameters", paramsList)
+                                }
+
+                                // Request Body
+                                if (method in listOf("post", "put", "patch", "delete") && bodyType != "EmptyRequestDTO") {
+                                    putJsonObject("requestBody") {
+                                        put("required", true)
+                                        putJsonObject("content") {
+                                            putJsonObject("application/json") {
+                                                putJsonObject("schema") {
+                                                    put("\$ref", "#/components/schemas/$bodyType")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Responses
+                                putJsonObject("responses") {
+                                    putJsonObject("200") {
+                                        put("description", "Successful response")
+                                        putJsonObject("content") {
+                                            putJsonObject("application/json") {
+                                                putJsonObject("schema") {
+                                                    put("type", "object")
+                                                    putJsonObject("properties") {
+                                                        putJsonObject("success") { put("type", "boolean") }
+                                                        putJsonObject("message") { put("type", "string"); put("nullable", true) }
+                                                        putJsonObject("error") { put("\$ref", "#/components/schemas/ErrorDetailsDTO"); put("nullable", true) }
+                                                        putJsonObject("data") {
+                                                            if (responseType == "T" || responseType == "Unit" || responseType == "Void") {
+                                                                put("type", "object")
+                                                                put("nullable", true)
+                                                            } else {
+                                                                put("\$ref", "#/components/schemas/$responseType")
+                                                                put("nullable", true)
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            putJsonObject("components") {
+                putJsonObject("securitySchemes") {
+                    putJsonObject("bearerAuth") {
+                        put("type", "http")
+                        put("scheme", "bearer")
+                        put("bearerFormat", "JWT")
+                    }
+                }
+
+                putJsonObject("schemas") {
+                    // Enums
+                    enums.forEach { (name, element) ->
+                        putJsonObject(name) {
+                            put("type", "string")
+                            putJsonArray("enum") {
+                                element.jsonObject["values"]?.jsonArray?.forEach { add(it) }
+                            }
+                        }
+                    }
+
+                    // DTOs
+                    dtos.forEach { (name, element) ->
+                        if (name == "DTOResponse" || name == "DTOParams") return@forEach
+
+                        val dtoObj = element.jsonObject
+                        val properties = dtoObj["properties"]?.jsonArray ?: emptyList()
+
+                        putJsonObject(name) {
+                            put("type", "object")
+                            putJsonObject("properties") {
+                                properties.forEach { prop ->
+                                    val p = prop.jsonObject
+                                    val pName = p["name"]!!.jsonPrimitive.content
+                                    val pType = p["type"]!!.jsonPrimitive.content
+                                    val isNullable = p["isNullable"]?.jsonPrimitive?.boolean == true
+
+                                    putJsonObject(pName) {
+                                        fillTypeSchema(pType)
+                                        if (isNullable) put("nullable", true)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        File(projectDir, "openapi.json").writeText(openApi.toString())
+    }
+
+    private fun JsonObjectBuilder.fillTypeSchema(type: String) {
+        when {
+            type == "Int" || type == "Long" -> {
+                put("type", "integer")
+                if (type == "Long") put("format", "int64")
+            }
+            type == "String" -> put("type", "string")
+            type == "Boolean" -> put("type", "boolean")
+            type == "Double" || type == "Float" -> {
+                put("type", "number")
+                if (type == "Double") put("format", "double")
+            }
+            type.startsWith("List<") -> {
+                val innerType = type.removePrefix("List<").removeSuffix(">")
+                put("type", "array")
+                putJsonObject("items") {
+                    fillTypeSchema(innerType)
+                }
+            }
+            type == "T" -> {
+                put("type", "object")
+            }
+            else -> {
+                put("\$ref", "#/components/schemas/$type")
+            }
+        }
+    }
+
+    private fun generateOperationId(method: String, path: String): String {
+        val segments = path.trim('/').split('/')
+        val sb = StringBuilder(method)
+        segments.forEach { seg ->
+            if (seg.isNotEmpty()) {
+                if (seg.startsWith("{")) {
+                    sb.append("By").append(seg.trim('{', '}').replaceFirstChar { it.uppercase() })
+                } else {
+                    sb.append(seg.replaceFirstChar { it.uppercase() })
+                }
+            }
+        }
+        return sb.toString()
     }
 
     private fun generateDTOs(outputDir: File, dtos: Map<String, JsonElement>, enums: Map<String, JsonElement>) {
