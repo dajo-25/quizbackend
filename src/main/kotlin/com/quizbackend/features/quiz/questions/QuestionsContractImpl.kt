@@ -1,7 +1,6 @@
 package com.quizbackend.features.quiz.questions
 
-import com.quizbackend.contracts.common.base.*
-import com.quizbackend.contracts.features.questions.*
+import com.quizbackend.contracts.generated.*
 import com.quizbackend.features.quiz.questions.models.Questions
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -9,7 +8,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class QuestionsContractImpl : QuestionsService {
 
-    override suspend fun DiscoverQuestions(body: EmptyRequestDTO, params: SearchQuestionsParamsDTO): DTOResponse<QuestionListResponseDTO> {
+    override suspend fun GetQuestions(body: EmptyRequestDTO, params: SearchQuestionsParamsDTO): DTOResponse<QuestionListResponseDTO> {
         return transaction {
             val questionsList = Questions.selectAll().where { Questions.isDiscoverable eq true }
                 .limit(10, offset = ((params.page - 1) * 10).toLong())
@@ -20,7 +19,7 @@ class QuestionsContractImpl : QuestionsService {
         }
     }
 
-    override suspend fun GetQuestion(body: EmptyRequestDTO, params: GetQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO> {
+    override suspend fun GetQuestionsId(body: EmptyRequestDTO, params: GetQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO> {
         return transaction {
             val q = Questions.selectAll().where { Questions.id eq params.id }.singleOrNull()
             if (q != null) {
@@ -31,7 +30,7 @@ class QuestionsContractImpl : QuestionsService {
         }
     }
 
-    override suspend fun GetQuestionsBatch(body: EmptyRequestDTO, params: GetQuestionsBatchParamsDTO): DTOResponse<QuestionListResponseDTO> {
+    override suspend fun GetBatch(body: EmptyRequestDTO, params: GetQuestionsBatchParamsDTO): DTOResponse<QuestionListResponseDTO> {
         val ids = params.ids
         return transaction {
             val questionsList = Questions.selectAll().where { Questions.id inList ids }
@@ -40,15 +39,15 @@ class QuestionsContractImpl : QuestionsService {
         }
     }
 
-    override suspend fun CreateQuestions(body: CreateQuestionsRequestDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun PostQuestions(body: CreateQuestionsRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
         return DTOResponse(true, GenericResponseDTO(true), null)
     }
 
-    override suspend fun UpdateQuestion(body: UpdateQuestionRequestDTO, params: UpdateQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO> {
+    override suspend fun PutQuestionsId(body: UpdateQuestionRequestDTO, params: UpdateQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO> {
         return DTOResponse(true, QuestionDataResponseDTO(question = QuestionDataDTO(params.id, "Updated Question", emptyList())), null)
     }
 
-    override suspend fun DeleteQuestion(body: EmptyRequestDTO, params: DeleteQuestionParamsDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun DeleteQuestionsId(body: EmptyRequestDTO, params: DeleteQuestionParamsDTO): DTOResponse<GenericResponseDTO> {
         return DTOResponse(true, GenericResponseDTO(true), null)
     }
 }

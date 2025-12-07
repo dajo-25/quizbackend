@@ -1,8 +1,8 @@
 package com.quizbackend.routing
 
 import io.ktor.http.HttpMethod
-import com.quizbackend.contracts.common.base.DTOResponse
-import com.quizbackend.contracts.common.base.DTOParams
+import com.quizbackend.contracts.generated.DTOResponse
+import com.quizbackend.contracts.generated.DTOParams
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
@@ -9,6 +11,14 @@ version = "0.0.1"
 
 application {
     mainClass = "io.ktor.server.netty.EngineMain"
+}
+
+// Register the custom task
+tasks.register<GenerateContractTask>("generateContract")
+
+// Ensure generation happens before compilation
+tasks.withType<KotlinCompile> {
+    dependsOn("generateContract")
 }
 
 dependencies {

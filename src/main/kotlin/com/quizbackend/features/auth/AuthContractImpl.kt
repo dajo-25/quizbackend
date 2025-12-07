@@ -1,13 +1,12 @@
 package com.quizbackend.features.auth
 
-import com.quizbackend.contracts.common.base.*
-import com.quizbackend.contracts.features.auth.*
+import com.quizbackend.contracts.generated.*
 
 class AuthContractImpl(
     private val authDomainService: AuthDomainService
 ) : AuthService {
 
-    override suspend fun Login(body: LoginRequestDTO): DTOResponse<LoginResponseDTO> {
+    override suspend fun PostLogin(body: LoginRequestDTO, params: EmptyParamsDTO): DTOResponse<LoginResponseDTO> {
         val token = authDomainService.login(body.email?.uppercase() ?: "", body.passwordHash ?: "", body.uniqueId ?: "")
         return if (token != null) {
             DTOResponse(true, LoginResponseDTO(token = token), null)
@@ -16,7 +15,7 @@ class AuthContractImpl(
         }
     }
 
-    override suspend fun Signup(body: SignupRequestDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun PostSignup(body: SignupRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
         val success = authDomainService.signup(
             body.email?.uppercase() ?: "",
             body.username ?: "",
@@ -24,23 +23,6 @@ class AuthContractImpl(
             body.surname ?: "",
             body.passwordHash ?: ""
         )
-        // Signup implementation in DomainService returns boolean.
-        // It doesn't auto-login in this mock, but the original code tried to.
-        // I'll stick to basic signup for now or follow the logic.
-        // Original logic: Signup -> Login -> Return Token.
-        // But the Interface now says return GenericResponseDTO (success boolean).
-        // If I want to return Token, I need to change Interface return type.
-        // But let's stick to what I defined in Contracts (GenericResponseDTO).
-        // If the user wants auto-login, the frontend usually handles it or I should change the contract.
-        // The original contract returned GenericResponseDTO in the file I read!
-        // Wait, let me check `AuthContracts.autogen.kt` original content.
-        // It had `DTOResponse<GenericResponseDTO>` for Signup.
-        // But `AuthContractImpl` was returning `SignupResponseDTO`?
-        // Ah, `AuthContractImpl` previously returned `DTOResponse<SignupResponseDTO>`.
-        // But the Interface said `GenericResponseDTO`.
-        // This confirms `AuthContractImpl` was diverging.
-        // I will return `GenericResponseDTO` as per current Interface.
-
         return if (success) {
             DTOResponse(true, GenericResponseDTO(true), null)
         } else {
@@ -48,20 +30,20 @@ class AuthContractImpl(
         }
     }
 
-    override suspend fun Logout(body: EmptyRequestDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun PostLogout(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
         return DTOResponse(true, GenericResponseDTO(true), null)
     }
 
-    override suspend fun DeleteAccount(body: EmptyRequestDTO): DTOResponse<MessageResponseDTO> {
+    override suspend fun DeleteAccount(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<MessageResponseDTO> {
         return DTOResponse(true, MessageResponseDTO("Account deleted (simulated)"), null)
     }
 
-    override suspend fun RecoverPassword(body: RecoverPasswordRequestDTO): DTOResponse<MessageResponseDTO> {
+    override suspend fun PostRecover(body: RecoverPasswordRequestDTO, params: EmptyParamsDTO): DTOResponse<MessageResponseDTO> {
         authDomainService.recoverPassword(body.email?.uppercase() ?: "")
         return DTOResponse(true, MessageResponseDTO("Recovery email sent"), null)
     }
 
-    override suspend fun VerifyEmail(body: VerifyEmailRequestDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun PostVerify(body: VerifyEmailRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
         val success = authDomainService.verifyEmail(body.code ?: "")
         return if (success) {
             DTOResponse(true, GenericResponseDTO(true), null)
@@ -70,15 +52,15 @@ class AuthContractImpl(
         }
     }
 
-    override suspend fun MustChangePassword(body: EmptyRequestDTO): DTOResponse<MustChangePasswordResponseDTO> {
+    override suspend fun GetMustChangePassword(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<MustChangePasswordResponseDTO> {
         return DTOResponse(true, MustChangePasswordResponseDTO(false), null)
     }
 
-    override suspend fun ChangePassword(body: ChangePasswordRequestDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun PostChangePassword(body: ChangePasswordRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
         return DTOResponse(true, GenericResponseDTO(true), null)
     }
 
-    override suspend fun Status(body: EmptyRequestDTO): DTOResponse<UserStatusResponseDTO> {
+    override suspend fun GetStatus(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<UserStatusResponseDTO> {
         return DTOResponse(true, UserStatusResponseDTO(UserStatusDataDTO(isVerified = true, mustChangePassword = false)), null)
     }
 }

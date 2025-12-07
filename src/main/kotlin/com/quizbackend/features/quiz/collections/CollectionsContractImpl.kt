@@ -1,27 +1,26 @@
 package com.quizbackend.features.quiz.collections
 
-import com.quizbackend.contracts.common.base.*
-import com.quizbackend.contracts.features.collections.*
+import com.quizbackend.contracts.generated.*
 
 class CollectionsContractImpl : CollectionsService {
 
-    override suspend fun GetCollectionsList(body: EmptyRequestDTO): DTOResponse<CollectionListResponseDTO> {
+    override suspend fun GetCollections(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<CollectionListResponseDTO> {
         return DTOResponse(true, CollectionListResponseDTO(emptyList()), null)
     }
 
-    override suspend fun CreateCollection(body: CreateCollectionRequestDTO): DTOResponse<IdDataResponseDTO> {
+    override suspend fun PostCollections(body: CreateCollectionRequestDTO, params: EmptyParamsDTO): DTOResponse<IdDataResponseDTO> {
         return DTOResponse(true, IdDataResponseDTO(1), null)
     }
 
-    override suspend fun GetCollection(body: EmptyRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<CollectionDetailResponseDTO> {
+    override suspend fun GetCollectionsId(body: EmptyRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<CollectionDetailResponseDTO> {
         return DTOResponse(true, CollectionDetailResponseDTO(null), null)
     }
 
-    override suspend fun UpdateCollection(body: UpdateCollectionRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun PutCollectionsId(body: UpdateCollectionRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<GenericResponseDTO> {
         return DTOResponse(true, GenericResponseDTO(true), null)
     }
 
-    override suspend fun DeleteCollection(body: EmptyRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun DeleteCollectionsId(body: EmptyRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<GenericResponseDTO> {
         return DTOResponse(true, GenericResponseDTO(true), null)
     }
 }
