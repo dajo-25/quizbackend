@@ -1,15 +1,15 @@
 package com.quizbackend.features.devices
 
-import com.quizbackend.contracts.common.base.*
-import com.quizbackend.contracts.features.notifications.*
+import com.quizbackend.contracts.generated.*
+import com.quizbackend.contracts.generated.DevicesService as DevicesContractService
 
-class NotificationsContractImpl : NotificationsService {
+class NotificationsContractImpl : DevicesContractService {
 
-    override suspend fun RegisterPushToken(body: RegisterPushTokenRequestDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun PostPushToken(body: RegisterPushTokenRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
         return DTOResponse(true, GenericResponseDTO(true), null)
     }
 
-    override suspend fun UnregisterPushToken(body: EmptyRequestDTO): DTOResponse<GenericResponseDTO> {
+    override suspend fun DeletePushToken(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
         return DTOResponse(true, GenericResponseDTO(true), null)
     }
 }

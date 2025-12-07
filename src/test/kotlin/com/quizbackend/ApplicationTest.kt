@@ -1,6 +1,6 @@
 package com.quizbackend
 
-import com.quizbackend.contracts.common.base.*
+import com.quizbackend.contracts.generated.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
