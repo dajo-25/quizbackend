@@ -24,46 +24,46 @@ data class BaseResponse(
 )
 
 @Serializable
-data class LoginResponse(val token: String? = null)
+data class LoginResponseDTO(val token: String? = null)
 
 @Serializable
-data class GenericResponse(val success: Boolean? = true)
+data class GenericResponseDTO(val success: Boolean? = true)
 
 @Serializable
-data class MessageResponse(val message: String? = null)
+data class MessageResponseDTO(val message: String? = null)
 
 @Serializable
-data class MustChangePasswordResponse(val mustChange: Boolean? = null)
+data class MustChangePasswordResponseDTO(val mustChange: Boolean? = null)
 
 @Serializable
-data class UserStatusResponse(val status: UserStatusDataDTO? = null)
+data class UserStatusResponseDTO(val status: UserStatusDataDTO? = null)
 
 @Serializable
-data class ProfileDataResponse(val profile: ProfileDataDTO? = null)
+data class ProfileDataResponseDTO(val profile: ProfileDataDTO? = null)
 
 @Serializable
-data class QuestionListResponse(val questions: List<QuestionDataDTO>? = null)
+data class QuestionListResponseDTO(val questions: List<QuestionDataDTO>? = null)
 
 @Serializable
-data class QuestionDataResponse(val question: QuestionDataDTO? = null)
+data class QuestionDataResponseDTO(val question: QuestionDataDTO? = null)
 
 @Serializable
-data class CollectionListResponse(val collections: List<CollectionDataDTO>? = null)
+data class CollectionListResponseDTO(val collections: List<CollectionDataDTO>? = null)
 
 @Serializable
-data class IdDataResponse(val id: Int? = null)
+data class IdDataResponseDTO(val id: Int? = null)
 
 @Serializable
-data class CollectionDetailResponse(val collection: CollectionDetailDataDTO? = null)
+data class CollectionDetailResponseDTO(val collection: CollectionDetailDataDTO? = null)
 
 @Serializable
-data class MarkListResponse(val marks: List<MarkDataDTO>? = null)
+data class MarkListResponseDTO(val marks: List<MarkDataDTO>? = null)
 
 @Serializable
-data class FriendRequestResponse(val friendRequest: FriendRequestDataDTO? = null)
+data class FriendRequestResponseDTO(val friendRequest: FriendRequestDataDTO? = null)
 
 @Serializable
-data class UserListResponse(val users: List<PublicUserProfileDTO>? = null)
+data class UserListResponseDTO(val users: List<PublicUserProfileDTO>? = null)
 
 @Serializable
 data class LoginRequestDTO(

@@ -5,15 +5,15 @@ import com.quizbackend.contracts.features.communities.*
 
 class CommunitiesMockContractImpl : CommunitiesService {
 
-    override suspend fun SendFriendRequest(body: SendFriendRequestDTO): DTOResponse<FriendRequestResponse> {
-        return DTOResponse(true, FriendRequestResponse(null), null)
+    override suspend fun SendFriendRequest(body: SendFriendRequestDTO): DTOResponse<FriendRequestResponseDTO> {
+        return DTOResponse(true, FriendRequestResponseDTO(null), null)
     }
 
-    override suspend fun RespondFriendRequest(body: EmptyRequestDTO): DTOResponse<GenericResponse> {
-        return DTOResponse(true, GenericResponse(true), null)
+    override suspend fun RespondFriendRequest(body: EmptyRequestDTO): DTOResponse<GenericResponseDTO> {
+        return DTOResponse(true, GenericResponseDTO(true), null)
     }
 
-    override suspend fun SearchUsers(body: EmptyRequestDTO): DTOResponse<UserListResponse> {
-        return DTOResponse(true, UserListResponse(emptyList()), null)
+    override suspend fun SearchUsers(body: EmptyRequestDTO): DTOResponse<UserListResponseDTO> {
+        return DTOResponse(true, UserListResponseDTO(emptyList()), null)
     }
 }

@@ -5,7 +5,7 @@ import com.quizbackend.contracts.features.marks.*
 
 class MarksMockContractImpl : MarksService {
 
-    override suspend fun GetMarks(body: EmptyRequestDTO): DTOResponse<MarkListResponse> {
-        return DTOResponse(true, MarkListResponse(emptyList()), null)
+    override suspend fun GetMarks(body: EmptyRequestDTO): DTOResponse<MarkListResponseDTO> {
+        return DTOResponse(true, MarkListResponseDTO(emptyList()), null)
     }
 }

@@ -39,7 +39,7 @@ class ApplicationTest {
         val signupText = signupResponse.bodyAsText()
         println("Signup Body: $signupText")
         assertEquals(HttpStatusCode.OK, signupResponse.status)
-        val signupBody = Json.decodeFromString<DTOResponse<GenericResponse>>(signupText)
+        val signupBody = Json.decodeFromString<DTOResponse<GenericResponseDTO>>(signupText)
         assertTrue(signupBody.success, "Signup failed: ${signupBody.error}")
 
         // Test Login
@@ -55,7 +55,7 @@ class ApplicationTest {
         val loginText = loginResponse.bodyAsText()
         println("Login Body: $loginText")
         assertEquals(HttpStatusCode.OK, loginResponse.status)
-        val loginBody = Json.decodeFromString<DTOResponse<LoginResponse>>(loginText)
+        val loginBody = Json.decodeFromString<DTOResponse<LoginResponseDTO>>(loginText)
         assertTrue(loginBody.success, "Login failed: ${loginBody.error}")
         assertNotNull(loginBody.data?.token)
     }

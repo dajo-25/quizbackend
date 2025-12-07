@@ -7,9 +7,9 @@ package com.quizbackend.contracts.features.collections
 import com.quizbackend.contracts.common.base.*
 
 interface CollectionsService {
-    suspend fun GetCollectionsList(body: EmptyRequestDTO): DTOResponse<CollectionListResponse>
-    suspend fun CreateCollection(body: CreateCollectionRequestDTO): DTOResponse<IdDataResponse>
-    suspend fun GetCollection(body: EmptyRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<CollectionDetailResponse>
-    suspend fun UpdateCollection(body: UpdateCollectionRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<GenericResponse>
-    suspend fun DeleteCollection(body: EmptyRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<GenericResponse>
+    suspend fun GetCollectionsList(body: EmptyRequestDTO): DTOResponse<CollectionListResponseDTO>
+    suspend fun CreateCollection(body: CreateCollectionRequestDTO): DTOResponse<IdDataResponseDTO>
+    suspend fun GetCollection(body: EmptyRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<CollectionDetailResponseDTO>
+    suspend fun UpdateCollection(body: UpdateCollectionRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<GenericResponseDTO>
+    suspend fun DeleteCollection(body: EmptyRequestDTO, params: UpdateCollectionParamsDTO): DTOResponse<GenericResponseDTO>
 }

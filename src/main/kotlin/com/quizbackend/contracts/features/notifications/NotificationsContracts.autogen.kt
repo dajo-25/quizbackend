@@ -7,6 +7,6 @@ package com.quizbackend.contracts.features.notifications
 import com.quizbackend.contracts.common.base.*
 
 interface NotificationsService {
-    suspend fun RegisterPushToken(body: RegisterPushTokenRequestDTO): DTOResponse<GenericResponse>
-    suspend fun UnregisterPushToken(body: EmptyRequestDTO): DTOResponse<GenericResponse>
+    suspend fun RegisterPushToken(body: RegisterPushTokenRequestDTO): DTOResponse<GenericResponseDTO>
+    suspend fun UnregisterPushToken(body: EmptyRequestDTO): DTOResponse<GenericResponseDTO>
 }

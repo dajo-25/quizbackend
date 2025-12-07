@@ -7,6 +7,6 @@ package com.quizbackend.contracts.features.profile
 import com.quizbackend.contracts.common.base.*
 
 interface ProfileService {
-    suspend fun SeeProfile(body: EmptyRequestDTO): DTOResponse<ProfileDataResponse>
-    suspend fun UpdateProfile(body: UpdateProfileRequestDTO): DTOResponse<ProfileDataResponse>
+    suspend fun SeeProfile(body: EmptyRequestDTO): DTOResponse<ProfileDataResponseDTO>
+    suspend fun UpdateProfile(body: UpdateProfileRequestDTO): DTOResponse<ProfileDataResponseDTO>
 }
