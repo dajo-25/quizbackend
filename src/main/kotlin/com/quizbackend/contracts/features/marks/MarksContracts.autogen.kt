@@ -7,5 +7,5 @@ package com.quizbackend.contracts.features.marks
 import com.quizbackend.contracts.common.base.*
 
 interface MarksService {
-    suspend fun GetMarks(body: EmptyRequestDTO): DTOResponse<MarkListResponse>
+    suspend fun GetMarks(body: EmptyRequestDTO): DTOResponse<MarkListResponseDTO>
 }

@@ -7,7 +7,7 @@ package com.quizbackend.contracts.features.communities
 import com.quizbackend.contracts.common.base.*
 
 interface CommunitiesService {
-    suspend fun SendFriendRequest(body: SendFriendRequestDTO): DTOResponse<FriendRequestResponse>
-    suspend fun RespondFriendRequest(body: EmptyRequestDTO): DTOResponse<GenericResponse>
-    suspend fun SearchUsers(body: EmptyRequestDTO): DTOResponse<UserListResponse>
+    suspend fun SendFriendRequest(body: SendFriendRequestDTO): DTOResponse<FriendRequestResponseDTO>
+    suspend fun RespondFriendRequest(body: EmptyRequestDTO): DTOResponse<GenericResponseDTO>
+    suspend fun SearchUsers(body: EmptyRequestDTO): DTOResponse<UserListResponseDTO>
 }

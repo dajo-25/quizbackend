@@ -7,10 +7,10 @@ package com.quizbackend.contracts.features.questions
 import com.quizbackend.contracts.common.base.*
 
 interface QuestionsService {
-    suspend fun DiscoverQuestions(body: EmptyRequestDTO, params: SearchQuestionsParamsDTO): DTOResponse<QuestionListResponse>
-    suspend fun GetQuestion(body: EmptyRequestDTO, params: GetQuestionParamsDTO): DTOResponse<QuestionDataResponse>
-    suspend fun GetQuestionsBatch(body: EmptyRequestDTO, params: GetQuestionsBatchParamsDTO): DTOResponse<QuestionListResponse>
-    suspend fun CreateQuestions(body: CreateQuestionsRequestDTO): DTOResponse<GenericResponse>
-    suspend fun UpdateQuestion(body: UpdateQuestionRequestDTO, params: UpdateQuestionParamsDTO): DTOResponse<QuestionDataResponse>
-    suspend fun DeleteQuestion(body: EmptyRequestDTO, params: DeleteQuestionParamsDTO): DTOResponse<GenericResponse>
+    suspend fun DiscoverQuestions(body: EmptyRequestDTO, params: SearchQuestionsParamsDTO): DTOResponse<QuestionListResponseDTO>
+    suspend fun GetQuestion(body: EmptyRequestDTO, params: GetQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO>
+    suspend fun GetQuestionsBatch(body: EmptyRequestDTO, params: GetQuestionsBatchParamsDTO): DTOResponse<QuestionListResponseDTO>
+    suspend fun CreateQuestions(body: CreateQuestionsRequestDTO): DTOResponse<GenericResponseDTO>
+    suspend fun UpdateQuestion(body: UpdateQuestionRequestDTO, params: UpdateQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO>
+    suspend fun DeleteQuestion(body: EmptyRequestDTO, params: DeleteQuestionParamsDTO): DTOResponse<GenericResponseDTO>
 }

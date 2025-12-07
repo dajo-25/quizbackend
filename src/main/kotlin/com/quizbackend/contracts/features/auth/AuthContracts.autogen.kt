@@ -7,13 +7,13 @@ package com.quizbackend.contracts.features.auth
 import com.quizbackend.contracts.common.base.*
 
 interface AuthService {
-    suspend fun Login(body: LoginRequestDTO): DTOResponse<LoginResponse>
-    suspend fun Signup(body: SignupRequestDTO): DTOResponse<GenericResponse>
-    suspend fun Logout(body: EmptyRequestDTO): DTOResponse<GenericResponse>
-    suspend fun DeleteAccount(body: EmptyRequestDTO): DTOResponse<MessageResponse>
-    suspend fun RecoverPassword(body: RecoverPasswordRequestDTO): DTOResponse<MessageResponse>
-    suspend fun VerifyEmail(body: VerifyEmailRequestDTO): DTOResponse<GenericResponse>
-    suspend fun MustChangePassword(body: EmptyRequestDTO): DTOResponse<MustChangePasswordResponse>
-    suspend fun ChangePassword(body: ChangePasswordRequestDTO): DTOResponse<GenericResponse>
-    suspend fun Status(body: EmptyRequestDTO): DTOResponse<UserStatusResponse>
+    suspend fun Login(body: LoginRequestDTO): DTOResponse<LoginResponseDTO>
+    suspend fun Signup(body: SignupRequestDTO): DTOResponse<GenericResponseDTO>
+    suspend fun Logout(body: EmptyRequestDTO): DTOResponse<GenericResponseDTO>
+    suspend fun DeleteAccount(body: EmptyRequestDTO): DTOResponse<MessageResponseDTO>
+    suspend fun RecoverPassword(body: RecoverPasswordRequestDTO): DTOResponse<MessageResponseDTO>
+    suspend fun VerifyEmail(body: VerifyEmailRequestDTO): DTOResponse<GenericResponseDTO>
+    suspend fun MustChangePassword(body: EmptyRequestDTO): DTOResponse<MustChangePasswordResponseDTO>
+    suspend fun ChangePassword(body: ChangePasswordRequestDTO): DTOResponse<GenericResponseDTO>
+    suspend fun Status(body: EmptyRequestDTO): DTOResponse<UserStatusResponseDTO>
 }
