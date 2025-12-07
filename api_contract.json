@@ -1,0 +1,663 @@
+{
+  "specificationName": "Custom API Contract Specification",
+  "version": "1.0.0",
+  "meta": {
+      "basePackage": "com.quizbackend.contracts"
+  },
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "bodyType": "LoginRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "LoginResponseDTO",
+      "requiresAuth": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/signup",
+      "bodyType": "SignupRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/auth/account",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "MessageResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "POST",
+      "path": "/auth/recover",
+      "bodyType": "RecoverPasswordRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "MessageResponseDTO",
+      "requiresAuth": false
+    },
+    {
+      "method": "POST",
+      "path": "/auth/verify",
+      "bodyType": "VerifyEmailRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": false
+    },
+    {
+      "method": "GET",
+      "path": "/auth/must-change-password",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "MustChangePasswordResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "POST",
+      "path": "/auth/change-password",
+      "bodyType": "ChangePasswordRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "GET",
+      "path": "/auth/status",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "UserStatusResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "GET",
+      "path": "/questions",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "SearchQuestionsParamsDTO",
+      "responseType": "QuestionListResponseDTO",
+      "requiresAuth": false
+    },
+    {
+      "method": "POST",
+      "path": "/questions",
+      "bodyType": "CreateQuestionsRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "GET",
+      "path": "/questions/{id}",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "GetQuestionParamsDTO",
+      "responseType": "QuestionDataResponseDTO",
+      "requiresAuth": false
+    },
+    {
+      "method": "PUT",
+      "path": "/questions/{id}",
+      "bodyType": "UpdateQuestionRequestDTO",
+      "paramsType": "UpdateQuestionParamsDTO",
+      "responseType": "QuestionDataResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/questions/{id}",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "DeleteQuestionParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "GET",
+      "path": "/questions/batch",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "GetQuestionsBatchParamsDTO",
+      "responseType": "QuestionListResponseDTO",
+      "requiresAuth": false
+    },
+    {
+      "method": "GET",
+      "path": "/collections",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "CollectionListResponseDTO",
+      "requiresAuth": false
+    },
+    {
+      "method": "POST",
+      "path": "/collections",
+      "bodyType": "CreateCollectionRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "IdDataResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "GET",
+      "path": "/collections/{id}",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "UpdateCollectionParamsDTO",
+      "responseType": "CollectionDetailResponseDTO",
+      "requiresAuth": false
+    },
+    {
+      "method": "PUT",
+      "path": "/collections/{id}",
+      "bodyType": "UpdateCollectionRequestDTO",
+      "paramsType": "UpdateCollectionParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/collections/{id}",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "UpdateCollectionParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "POST",
+      "path": "/communities/friend-request",
+      "bodyType": "SendFriendRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "FriendRequestResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "POST",
+      "path": "/communities/friend-request/respond",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "GET",
+      "path": "/communities/users",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "UserListResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "GET",
+      "path": "/marks",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "MarkListResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "POST",
+      "path": "/devices/push-token",
+      "bodyType": "RegisterPushTokenRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/devices/push-token",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "GET",
+      "path": "/profile",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "ProfileDataResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "PUT",
+      "path": "/profile",
+      "bodyType": "UpdateProfileRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "ProfileDataResponseDTO",
+      "requiresAuth": true
+    }
+  ],
+  "dtos": {
+    "DTOParams": {
+      "inherits": null,
+      "properties": []
+    },
+    "EmptyParamsDTO": {
+      "inherits": "DTOParams",
+      "properties": []
+    },
+    "SearchQuestionsParamsDTO": {
+      "inherits": "DTOParams",
+      "properties": [
+        { "name": "page", "type": "Int", "isNullable": false }
+      ]
+    },
+    "GetQuestionParamsDTO": {
+      "inherits": "DTOParams",
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": false }
+      ]
+    },
+    "GetQuestionsBatchParamsDTO": {
+      "inherits": "DTOParams",
+      "properties": [
+        { "name": "ids", "type": "List<Int>", "isNullable": false }
+      ]
+    },
+    "UpdateQuestionParamsDTO": {
+      "inherits": "DTOParams",
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": false }
+      ]
+    },
+    "DeleteQuestionParamsDTO": {
+      "inherits": "DTOParams",
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": false }
+      ]
+    },
+    "UpdateCollectionParamsDTO": {
+      "inherits": "DTOParams",
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": false }
+      ]
+    },
+    "DTOResponse": {
+      "inherits": null,
+      "properties": [
+        { "name": "success", "type": "Boolean", "isNullable": false },
+        { "name": "data", "type": "T", "isNullable": true },
+        { "name": "message", "type": "String", "isNullable": true },
+        { "name": "error", "type": "ErrorDetailsDTO", "isNullable": true }
+      ]
+    },
+    "EmptyRequestDTO": {
+      "inherits": null,
+      "properties": []
+    },
+    "BaseResponse": {
+      "inherits": null,
+      "properties": [
+        { "name": "success", "type": "Boolean", "isNullable": true },
+        { "name": "error", "type": "String", "isNullable": true }
+      ]
+    },
+    "LoginResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "token", "type": "String", "isNullable": true }
+      ]
+    },
+    "GenericResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "success", "type": "Boolean", "isNullable": true }
+      ]
+    },
+    "MessageResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "message", "type": "String", "isNullable": true }
+      ]
+    },
+    "MustChangePasswordResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "mustChange", "type": "Boolean", "isNullable": true }
+      ]
+    },
+    "UserStatusResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "status", "type": "UserStatusDataDTO", "isNullable": true }
+      ]
+    },
+    "ProfileDataResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "profile", "type": "ProfileDataDTO", "isNullable": true }
+      ]
+    },
+    "QuestionListResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "questions", "type": "List<QuestionDataDTO>", "isNullable": true }
+      ]
+    },
+    "QuestionDataResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "question", "type": "QuestionDataDTO", "isNullable": true }
+      ]
+    },
+    "CollectionListResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "collections", "type": "List<CollectionDataDTO>", "isNullable": true }
+      ]
+    },
+    "IdDataResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true }
+      ]
+    },
+    "CollectionDetailResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "collection", "type": "CollectionDetailDataDTO", "isNullable": true }
+      ]
+    },
+    "MarkListResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "marks", "type": "List<MarkDataDTO>", "isNullable": true }
+      ]
+    },
+    "FriendRequestResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "friendRequest", "type": "FriendRequestDataDTO", "isNullable": true }
+      ]
+    },
+    "UserListResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "users", "type": "List<PublicUserProfileDTO>", "isNullable": true }
+      ]
+    },
+    "LoginRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "email", "type": "String", "isNullable": true },
+        { "name": "passwordHash", "type": "String", "isNullable": true },
+        { "name": "uniqueId", "type": "String", "isNullable": true }
+      ]
+    },
+    "LoginDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "token", "type": "String", "isNullable": true },
+        { "name": "message", "type": "String", "isNullable": true }
+      ]
+    },
+    "SignupRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "email", "type": "String", "isNullable": true },
+        { "name": "username", "type": "String", "isNullable": true },
+        { "name": "name", "type": "String", "isNullable": true },
+        { "name": "surname", "type": "String", "isNullable": true },
+        { "name": "passwordHash", "type": "String", "isNullable": true }
+      ]
+    },
+    "MessageDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "message", "type": "String", "isNullable": true }
+      ]
+    },
+    "RecoverPasswordRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "email", "type": "String", "isNullable": true }
+      ]
+    },
+    "VerifyEmailRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "code", "type": "String", "isNullable": true }
+      ]
+    },
+    "MustChangePasswordDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "must_change_password", "type": "Boolean", "isNullable": true }
+      ]
+    },
+    "ChangePasswordRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "oldHash", "type": "String", "isNullable": true },
+        { "name": "newHash", "type": "String", "isNullable": true }
+      ]
+    },
+    "UserStatusDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "email", "type": "String", "isNullable": true },
+        { "name": "username", "type": "String", "isNullable": true },
+        { "name": "isVerified", "type": "Boolean", "isNullable": true },
+        { "name": "mustChangePassword", "type": "Boolean", "isNullable": true }
+      ]
+    },
+    "RegisterPushTokenRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "pushToken", "type": "String", "isNullable": true }
+      ]
+    },
+    "ProfileDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "email", "type": "String", "isNullable": true },
+        { "name": "username", "type": "String", "isNullable": true },
+        { "name": "name", "type": "String", "isNullable": true },
+        { "name": "surname", "type": "String", "isNullable": true },
+        { "name": "isVerified", "type": "Boolean", "isNullable": true }
+      ]
+    },
+    "UpdateProfileRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "name", "type": "String", "isNullable": true },
+        { "name": "surname", "type": "String", "isNullable": true },
+        { "name": "username", "type": "String", "isNullable": true }
+      ]
+    },
+    "AnswerDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "text", "type": "String", "isNullable": true },
+        { "name": "isCorrect", "type": "Boolean", "isNullable": true }
+      ]
+    },
+    "QuestionDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "text", "type": "String", "isNullable": true },
+        { "name": "answers", "type": "List<AnswerDataDTO>", "isNullable": true }
+      ]
+    },
+    "LocalizationDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "locale", "type": "String", "isNullable": true },
+        { "name": "text", "type": "String", "isNullable": true }
+      ]
+    },
+    "CreateAnswerInputDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "localizations", "type": "List<LocalizationDTO>", "isNullable": true }
+      ]
+    },
+    "CreateQuestionInputDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "localizations", "type": "List<LocalizationDTO>", "isNullable": true },
+        { "name": "answers", "type": "List<CreateAnswerInputDTO>", "isNullable": true },
+        { "name": "correctAnswersIndices", "type": "List<Int>", "isNullable": true },
+        { "name": "isDiscoverable", "type": "Boolean", "isNullable": true },
+        { "name": "collectionIds", "type": "List<Int>", "isNullable": true }
+      ]
+    },
+    "CreateQuestionsRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "questions", "type": "List<CreateQuestionInputDTO>", "isNullable": true }
+      ]
+    },
+    "UpdateAnswerInputDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "localizations", "type": "List<LocalizationDTO>", "isNullable": true }
+      ]
+    },
+    "UpdateQuestionRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "localizations", "type": "List<LocalizationDTO>", "isNullable": true },
+        { "name": "answers", "type": "List<UpdateAnswerInputDTO>", "isNullable": true },
+        { "name": "correctAnswersIndices", "type": "List<Int>", "isNullable": true },
+        { "name": "isDiscoverable", "type": "Boolean", "isNullable": true },
+        { "name": "collectionIds", "type": "List<Int>", "isNullable": true }
+      ]
+    },
+    "CollectionDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "name", "type": "String", "isNullable": true },
+        { "name": "description", "type": "String", "isNullable": true },
+        { "name": "isPublic", "type": "Boolean", "isNullable": true },
+        { "name": "creatorId", "type": "Int", "isNullable": true },
+        { "name": "createdAt", "type": "String", "isNullable": true }
+      ]
+    },
+    "CollectionDetailDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "name", "type": "String", "isNullable": true },
+        { "name": "description", "type": "String", "isNullable": true },
+        { "name": "isPublic", "type": "Boolean", "isNullable": true },
+        { "name": "creatorId", "type": "Int", "isNullable": true },
+        { "name": "createdAt", "type": "String", "isNullable": true },
+        { "name": "questionIds", "type": "List<Int>", "isNullable": true }
+      ]
+    },
+    "CreateCollectionRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "name", "type": "String", "isNullable": true },
+        { "name": "description", "type": "String", "isNullable": true },
+        { "name": "isPublic", "type": "Boolean", "isNullable": true }
+      ]
+    },
+    "IdDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true }
+      ]
+    },
+    "UpdateCollectionRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "name", "type": "String", "isNullable": true },
+        { "name": "description", "type": "String", "isNullable": true },
+        { "name": "isPublic", "type": "Boolean", "isNullable": true }
+      ]
+    },
+    "MarkDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "questionId", "type": "Int", "isNullable": true },
+        { "name": "isCorrect", "type": "Boolean", "isNullable": true },
+        { "name": "createdAt", "type": "String", "isNullable": true }
+      ]
+    },
+    "SendFriendRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "targetUserId", "type": "Int", "isNullable": true }
+      ]
+    },
+    "FriendRequestDataDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "senderId", "type": "Int", "isNullable": true },
+        { "name": "receiverId", "type": "Int", "isNullable": true },
+        { "name": "status", "type": "String", "isNullable": true },
+        { "name": "createdAt", "type": "String", "isNullable": true }
+      ]
+    },
+    "PublicUserProfileDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "id", "type": "Int", "isNullable": true },
+        { "name": "username", "type": "String", "isNullable": true },
+        { "name": "name", "type": "String", "isNullable": true },
+        { "name": "surname", "type": "String", "isNullable": true }
+      ]
+    },
+    "ErrorDetailsDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "type", "type": "ErrorType", "isNullable": true },
+        { "name": "message", "type": "String", "isNullable": true }
+      ]
+    }
+  },
+  "enums": {
+    "ErrorType": {
+      "values": [
+        "INVALID_CREDENTIALS",
+        "ACCOUNT_ALREADY_EXISTS",
+        "EMAIL_NOT_VERIFIED",
+        "INVALID_VERIFICATION_CODE",
+        "PASSWORD_TOO_SHORT",
+        "PASSWORD_REQUIRES_NUMBER",
+        "PASSWORD_REQUIRES_UPPERCASE",
+        "PASSWORD_RECENTLY_USED",
+        "INVALID_EMAIL_FORMAT",
+        "TOKEN_EXPIRED",
+        "INVALID_TOKEN",
+        "UNAUTHORIZED",
+        "FORBIDDEN",
+        "USER_NOT_FOUND",
+        "USERNAME_ALREADY_TAKEN",
+        "INVALID_PROFILE_DATA",
+        "QUESTION_NOT_FOUND",
+        "INVALID_QUESTION_DATA",
+        "EMPTY_QUESTION_TEXT",
+        "MISSING_CORRECT_ANSWER",
+        "TOO_MANY_ANSWERS",
+        "COLLECTION_NOT_FOUND",
+        "COLLECTION_ALREADY_EXISTS",
+        "CANNOT_MODIFY_PUBLIC_COLLECTION",
+        "ACCESS_DENIED_TO_COLLECTION",
+        "FRIEND_REQUEST_ALREADY_SENT",
+        "FRIEND_REQUEST_NOT_FOUND",
+        "CANNOT_FRIEND_SELF",
+        "USER_BLOCKED",
+        "INTERNAL_SERVER_ERROR",
+        "BAD_REQUEST",
+        "METHOD_NOT_ALLOWED",
+        "NOT_IMPLEMENTED",
+        "ROUTE_NOT_EXISTS_OR_BAD_IMPLEMENTED",
+        "MISSING_DATA"
+      ]
+    }
+  }
+}
