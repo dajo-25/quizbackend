@@ -146,7 +146,7 @@ data class IdDataResponseDTO(
 
 @Serializable
 data class CollectionDetailResponseDTO(
-    val collection: CollectionDetailDataDTO
+    val collection: CollectionDetailDataDTO? = null
 )
 
 @Serializable
@@ -233,7 +233,7 @@ data class ProfileDataDTO(
     val username: String,
     val name: String,
     val surname: String,
-    val isVerified: Boolean
+    val isVerified: Boolean? = null
 )
 
 @Serializable
