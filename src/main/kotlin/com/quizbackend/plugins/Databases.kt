@@ -22,7 +22,7 @@ fun Application.configureDatabases(jdbcUrl: String = "jdbc:sqlite:quiz.db") {
     )
 
     transaction {
-        SchemaUtils.create(
+        SchemaUtils.createMissingTablesAndColumns(
             Questions,
             Answers,
             QuestionsLocalizations,
