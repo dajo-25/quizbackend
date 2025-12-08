@@ -90,28 +90,28 @@ class EmptyRequestDTO
 
 @Serializable
 data class BaseResponse(
-    val success: Boolean? = null,
-    val error: String? = null
+    val success: Boolean,
+    val error: String
 )
 
 @Serializable
 data class LoginResponseDTO(
-    val token: String? = null
+    val token: String
 )
 
 @Serializable
 data class GenericResponseDTO(
-    val success: Boolean? = null
+    val success: Boolean
 )
 
 @Serializable
 data class MessageResponseDTO(
-    val message: String? = null
+    val message: String
 )
 
 @Serializable
 data class MustChangePasswordResponseDTO(
-    val mustChange: Boolean? = null
+    val mustChange: Boolean
 )
 
 @Serializable
@@ -121,37 +121,37 @@ data class UserStatusResponseDTO(
 
 @Serializable
 data class ProfileDataResponseDTO(
-    val profile: ProfileDataDTO? = null
+    val profile: ProfileDataDTO
 )
 
 @Serializable
 data class QuestionListResponseDTO(
-    val questions: List<QuestionDataDTO>? = null
+    val questions: List<QuestionDataDTO>
 )
 
 @Serializable
 data class QuestionDataResponseDTO(
-    val question: QuestionDataDTO? = null
+    val question: QuestionDataDTO
 )
 
 @Serializable
 data class CollectionListResponseDTO(
-    val collections: List<CollectionDataDTO>? = null
+    val collections: List<CollectionDataDTO>
 )
 
 @Serializable
 data class IdDataResponseDTO(
-    val id: Int? = null
+    val id: Int
 )
 
 @Serializable
 data class CollectionDetailResponseDTO(
-    val collection: CollectionDetailDataDTO? = null
+    val collection: CollectionDetailDataDTO
 )
 
 @Serializable
 data class MarkListResponseDTO(
-    val marks: List<MarkDataDTO>? = null
+    val marks: List<MarkDataDTO>
 )
 
 @Serializable
@@ -161,55 +161,55 @@ data class FriendRequestResponseDTO(
 
 @Serializable
 data class UserListResponseDTO(
-    val users: List<PublicUserProfileDTO>? = null
+    val users: List<PublicUserProfileDTO>
 )
 
 @Serializable
 data class LoginRequestDTO(
-    val email: String? = null,
-    val passwordHash: String? = null,
-    val uniqueId: String? = null
+    val email: String,
+    val passwordHash: String,
+    val uniqueId: String
 )
 
 @Serializable
 data class LoginDataDTO(
-    val token: String? = null,
-    val message: String? = null
+    val token: String,
+    val message: String
 )
 
 @Serializable
 data class SignupRequestDTO(
-    val email: String? = null,
-    val username: String? = null,
-    val name: String? = null,
-    val surname: String? = null,
-    val passwordHash: String? = null
+    val email: String,
+    val username: String,
+    val name: String,
+    val surname: String,
+    val passwordHash: String
 )
 
 @Serializable
 data class MessageDataDTO(
-    val message: String? = null
+    val message: String
 )
 
 @Serializable
 data class RecoverPasswordRequestDTO(
-    val email: String? = null
+    val email: String
 )
 
 @Serializable
 data class VerifyEmailRequestDTO(
-    val code: String? = null
+    val code: String
 )
 
 @Serializable
 data class MustChangePasswordDataDTO(
-    val must_change_password: Boolean? = null
+    val must_change_password: Boolean
 )
 
 @Serializable
 data class ChangePasswordRequestDTO(
-    val oldHash: String? = null,
-    val newHash: String? = null
+    val oldHash: String,
+    val newHash: String
 )
 
 @Serializable
@@ -217,158 +217,159 @@ data class UserStatusDataDTO(
     val id: Int? = null,
     val email: String? = null,
     val username: String? = null,
-    val isVerified: Boolean? = null,
-    val mustChangePassword: Boolean? = null
+    val isVerified: Boolean,
+    val mustChangePassword: Boolean
 )
 
 @Serializable
 data class RegisterPushTokenRequestDTO(
-    val pushToken: String? = null
+    val pushToken: String
 )
 
 @Serializable
 data class ProfileDataDTO(
-    val id: Int? = null,
-    val email: String? = null,
-    val username: String? = null,
-    val name: String? = null,
-    val surname: String? = null,
-    val isVerified: Boolean? = null
+    val id: Int,
+    val email: String,
+    val username: String,
+    val name: String,
+    val surname: String,
+    val isVerified: Boolean
 )
 
 @Serializable
 data class UpdateProfileRequestDTO(
-    val name: String? = null,
-    val surname: String? = null,
-    val username: String? = null
+    val name: String,
+    val surname: String,
+    val username: String
 )
 
 @Serializable
 data class AnswerDataDTO(
-    val id: Int? = null,
-    val text: String? = null,
-    val isCorrect: Boolean? = null
+    val id: Int,
+    val text: String,
+    val isCorrect: Boolean
 )
 
 @Serializable
 data class QuestionDataDTO(
-    val id: Int? = null,
-    val text: String? = null,
-    val answers: List<AnswerDataDTO>? = null
+    val id: Int,
+    val text: String,
+    val answers: List<AnswerDataDTO>
 )
 
 @Serializable
 data class LocalizationDTO(
-    val locale: String? = null,
-    val text: String? = null
+    val locale: String,
+    val text: String
 )
 
 @Serializable
 data class CreateAnswerInputDTO(
-    val localizations: List<LocalizationDTO>? = null
+    val localizations: List<LocalizationDTO>
 )
 
 @Serializable
 data class CreateQuestionInputDTO(
-    val localizations: List<LocalizationDTO>? = null,
-    val answers: List<CreateAnswerInputDTO>? = null,
-    val correctAnswersIndices: List<Int>? = null,
-    val isDiscoverable: Boolean? = null,
-    val collectionIds: List<Int>? = null
+    val localizations: List<LocalizationDTO>,
+    val answers: List<CreateAnswerInputDTO>,
+    val correctAnswersIndices: List<Int>,
+    val isDiscoverable: Boolean,
+    val collectionIds: List<Int>
 )
 
 @Serializable
 data class CreateQuestionsRequestDTO(
-    val questions: List<CreateQuestionInputDTO>? = null
+    val questions: List<CreateQuestionInputDTO>
 )
 
 @Serializable
 data class UpdateAnswerInputDTO(
-    val id: Int? = null,
-    val localizations: List<LocalizationDTO>? = null
+    val id: Int,
+    val localizations: List<LocalizationDTO>
 )
 
 @Serializable
 data class UpdateQuestionRequestDTO(
-    val localizations: List<LocalizationDTO>? = null,
-    val answers: List<UpdateAnswerInputDTO>? = null,
-    val correctAnswersIndices: List<Int>? = null,
-    val isDiscoverable: Boolean? = null,
-    val collectionIds: List<Int>? = null
+    val localizations: List<LocalizationDTO>,
+    val answers: List<UpdateAnswerInputDTO>,
+    val correctAnswersIndices: List<Int>,
+    val isDiscoverable: Boolean,
+    val collectionIds: List<Int>
 )
 
 @Serializable
 data class CollectionDataDTO(
-    val id: Int? = null,
-    val name: String? = null,
-    val description: String? = null,
-    val isPublic: Boolean? = null,
-    val creatorId: Int? = null,
-    val createdAt: String? = null
+    val id: Int,
+    val name: String,
+    val description: String,
+    val isPublic: Boolean,
+    val creatorId: Int,
+    val createdAt: String
 )
 
 @Serializable
 data class CollectionDetailDataDTO(
-    val id: Int? = null,
-    val name: String? = null,
-    val description: String? = null,
-    val isPublic: Boolean? = null,
-    val creatorId: Int? = null,
-    val createdAt: String? = null,
-    val questionIds: List<Int>? = null
+    val id: Int,
+    val name: String,
+    val description: String,
+    val isPublic: Boolean,
+    val creatorId: Int,
+    val createdAt: String,
+    val questionIds: List<Int>
 )
 
 @Serializable
 data class CreateCollectionRequestDTO(
-    val name: String? = null,
-    val description: String? = null,
-    val isPublic: Boolean? = null
+    val name: String,
+    val description: String,
+    val isPublic: Boolean
 )
 
 @Serializable
 data class IdDataDTO(
-    val id: Int? = null
+    val id: Int
 )
 
 @Serializable
 data class UpdateCollectionRequestDTO(
-    val name: String? = null,
-    val description: String? = null,
-    val isPublic: Boolean? = null
+    val name: String,
+    val description: String,
+    val isPublic: Boolean
 )
 
 @Serializable
 data class MarkDataDTO(
-    val id: Int? = null,
-    val questionId: Int? = null,
-    val isCorrect: Boolean? = null,
-    val createdAt: String? = null
+    val id: Int,
+    val questionId: Int,
+    val isCorrect: Boolean,
+    val createdAt: String
 )
 
 @Serializable
 data class SendFriendRequestDTO(
-    val targetUserId: Int? = null
+    val targetUserId: Int
 )
 
 @Serializable
 data class FriendRequestDataDTO(
-    val id: Int? = null,
-    val senderId: Int? = null,
-    val receiverId: Int? = null,
-    val status: String? = null,
-    val createdAt: String? = null
+    val id: Int,
+    val senderId: Int,
+    val receiverId: Int,
+    val status: String,
+    val createdAt: String
 )
 
 @Serializable
 data class PublicUserProfileDTO(
-    val id: Int? = null,
-    val username: String? = null,
-    val name: String? = null,
-    val surname: String? = null
+    val id: Int,
+    val username: String,
+    val name: String,
+    val surname: String
 )
 
 @Serializable
 data class ErrorDetailsDTO(
-    val type: ErrorType? = null,
+    val type: ErrorType,
     val message: String? = null
 )
+

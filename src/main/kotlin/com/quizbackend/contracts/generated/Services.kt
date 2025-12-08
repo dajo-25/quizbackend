@@ -50,3 +50,4 @@ interface ProfileService {
     suspend fun GetProfile(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<ProfileDataResponseDTO>
     suspend fun PutProfile(body: UpdateProfileRequestDTO, params: EmptyParamsDTO): DTOResponse<ProfileDataResponseDTO>
 }
+

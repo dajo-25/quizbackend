@@ -101,10 +101,10 @@ fun <Body : Any, Params : DTOParams, Response : Any> Route.configureRoute(
                         ErrorDetailsDTO(ErrorType.MISSING_DATA, e.message ?: "Invalid data")
                     }
                     else -> {
-                        ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, e.message)
+                        e.message?.let { ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, it) }
                     }
                 }
-                call.respond(HttpStatusCode.BadRequest, DTOResponse<Unit>(false, null, "Error: ${errorDetails.message}", errorDetails))
+                call.respond(HttpStatusCode.BadRequest, DTOResponse<Unit>(false, null, "Error: ${errorDetails?.message}", errorDetails))
             }
         }
     }
