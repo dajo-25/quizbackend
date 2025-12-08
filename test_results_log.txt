@@ -1,0 +1,323 @@
+            --- TEST: Signup - Good Data ---
+            RESULT: PASS
+            INPUT: SignupRequestDTO(email=test1765152096820@example.com, username=user1765152096824, name=Test, surname=User, passwordHash=Password123!)
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "success": true
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Signup - Bad Email ---
+            RESULT: PASS
+            INPUT: SignupRequestDTO(email=invalid-email, username=user1765152098213, name=Test, surname=User, passwordHash=Password123!)
+            STATUS: 400 Bad Request
+            OUTPUT: {
+    "success": false,
+    "error": {
+        "type": "ACCOUNT_ALREADY_EXISTS",
+        "message": "User already exists"
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Signup - Missing Data ---
+            RESULT: FAIL
+            INPUT: Missing email
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "success": true
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Login - Good Data ---
+            RESULT: PASS
+            INPUT: LoginRequestDTO(email=test1765152096820@example.com, passwordHash=Password123!, uniqueId=device1)
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "token": "84aeddf73de2c0b0b0bf64c2e3014a3130f881a2022ca4c9e0e1279f88dacbaa002570a12ebc87638b9c28775a38a0b52895009b8d9e989ebeded959886279ea"
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Login - Bad Password ---
+            RESULT: PASS
+            INPUT: LoginRequestDTO(email=test1765152096820@example.com, passwordHash=wrongpass, uniqueId=device1)
+            STATUS: 400 Bad Request
+            OUTPUT: {
+    "success": false,
+    "error": {
+        "type": "INVALID_CREDENTIALS",
+        "message": "Invalid credentials"
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Auth Status - No Token ---
+            RESULT: PASS
+            INPUT: null
+            STATUS: 401 Unauthorized
+            OUTPUT: {
+    "type": "UNAUTHORIZED",
+    "message": "Unauthorized"
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Auth Status - Bad Token ---
+            RESULT: PASS
+            INPUT: Bearer invalidtoken
+            STATUS: 401 Unauthorized
+            OUTPUT: {
+    "type": "UNAUTHORIZED",
+    "message": "Unauthorized"
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Auth Status - Correct Token ---
+            RESULT: PASS
+            INPUT: null
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "status": {
+            "isVerified": true,
+            "mustChangePassword": false
+        }
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Get Profile ---
+            RESULT: PASS
+            INPUT: null
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "profile": {
+            "id": 1,
+            "email": "mock@email.com",
+            "username": "mockUser",
+            "name": "Mock",
+            "surname": "User"
+        }
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Update Profile - Good Data ---
+            RESULT: PASS
+            INPUT: UpdateProfileRequestDTO(name=UpdatedName, surname=UpdatedSurname, username=updateduser)
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "profile": {
+            "id": 1,
+            "email": "mock@email.com",
+            "username": "updateduser",
+            "name": "UpdatedName",
+            "surname": "UpdatedSurname"
+        }
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Create Collection - Good Data ---
+            RESULT: PASS
+            INPUT: CreateCollectionRequestDTO(name=My Collection, description=Desc, isPublic=true)
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "id": 1
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Get Collections ---
+            RESULT: PASS
+            INPUT: null
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "collections": []
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Update Collection ---
+            RESULT: PASS
+            INPUT: UpdateCollectionRequestDTO(name=Updated Collection, description=New Desc, isPublic=false)
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "success": true
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Create Question - Good Data ---
+            RESULT: PASS
+            INPUT: CreateQuestionsRequestDTO(questions=[CreateQuestionInputDTO(localizations=[LocalizationDTO(locale=en, text=Is this a test?)], answers=[CreateAnswerInputDTO(localizations=[LocalizationDTO(locale=en, text=Yes)]), CreateAnswerInputDTO(localizations=[LocalizationDTO(locale=en, text=No)])], correctAnswersIndices=[0], isDiscoverable=true, collectionIds=[1])])
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "success": true
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Get Questions List ---
+            RESULT: PASS
+            INPUT: page=0
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "questions": []
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Get Question Detail - Not Found ---
+            RESULT: PASS
+            INPUT: id=999999
+            STATUS: 400 Bad Request
+            OUTPUT: {
+    "success": false,
+    "error": {
+        "type": "QUESTION_NOT_FOUND",
+        "message": "Question not found"
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Get Users List ---
+            RESULT: PASS
+            INPUT: null
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "users": []
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Send Friend Request ---
+            RESULT: PASS
+            INPUT: SendFriendRequestDTO(targetUserId=123)
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {}
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Get Marks ---
+            RESULT: PASS
+            INPUT: null
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "marks": []
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Register Push Token ---
+            RESULT: PASS
+            INPUT: RegisterPushTokenRequestDTO(pushToken=token_123)
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "success": true
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Delete Push Token ---
+            RESULT: PASS
+            INPUT: null
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "success": true
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Delete Collection ---
+            RESULT: PASS
+            INPUT: id=1
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "success": true
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Delete Account ---
+            RESULT: PASS
+            INPUT: null
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "message": "Account deleted (simulated)"
+    }
+}
+            ERROR: None
+            -----------------------
+
+            --- TEST: Login After Delete ---
+            RESULT: FAIL
+            INPUT: LoginRequestDTO(email=test1765152096820@example.com, passwordHash=Password123!, uniqueId=device1)
+            STATUS: 200 OK
+            OUTPUT: {
+    "success": true,
+    "data": {
+        "token": "62f054387faefd6afbc2d899d26055b8b25dd2d08bffbf9053e637014723e79d0743f44edc431080c6f53c81ea598ce2cbdf319e43dfd9902c08392efbdea3d3"
+    }
+}
+            ERROR: None
+            -----------------------
