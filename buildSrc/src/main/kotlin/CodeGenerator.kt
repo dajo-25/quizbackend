@@ -33,6 +33,9 @@ open class GenerateContractTask : DefaultTask() {
 
         // Generate OpenAPI
         generateOpenApi(projectDir, json)
+
+        // Generate Dart Client
+        generateDartClient(projectDir, json)
     }
 
     private fun generateOpenApi(projectDir: File, json: JsonObject) {
@@ -258,7 +261,6 @@ open class GenerateContractTask : DefaultTask() {
         }
 
         // DTOs
-        // We need to handle dependencies/ordering? Or just dump them. Kotlin allows forward references in same file.
         dtos.forEach { (name, element) ->
             val dtoObj = element.jsonObject
             val inherits = dtoObj["inherits"]?.jsonPrimitive?.contentOrNull
@@ -266,8 +268,6 @@ open class GenerateContractTask : DefaultTask() {
 
             fileContent.append("@Serializable\n")
             if (properties.isEmpty() && inherits == null) {
-                // Special case for abstract DTOParams if it has no properties?
-                // Or EmptyRequestDTO
                 if (name == "DTOParams") {
                     fileContent.append("abstract class $name\n\n")
                 } else if (inherits == "DTOParams") {
@@ -284,32 +284,21 @@ open class GenerateContractTask : DefaultTask() {
                         val pName = p["name"]!!.jsonPrimitive.content
                         val pType = p["type"]!!.jsonPrimitive.content
                         val isNullable = p["isNullable"]?.jsonPrimitive?.boolean == true
-
-                        // generic T handling for DTOResponse
                         val typeStr = if (pType == "T") "T" else pType
-
                         val suffix = if (index < properties.size - 1) "," else ""
-                        // default null if nullable
                         val default = if (isNullable) " = null" else ""
-                        // If type is T, we need <T> in class def.
-
                         fileContent.append("    val $pName: $typeStr${if (isNullable) "?" else ""}$default$suffix\n")
                     }
                     fileContent.append(")")
                 } else {
-                     // Class with no properties but might inherit
                      fileContent.append("class $name")
                 }
 
                 if (inherits != null) {
-                    fileContent.append(" : $inherits()") // Assuming base classes have empty constructor or we handle them specially
+                    fileContent.append(" : $inherits()")
                 }
 
-                // Add <T> to class definition if one property is T
-                // Quick hack: check if "T" is used in properties
                  if (properties.any { it.jsonObject["type"]!!.jsonPrimitive.content == "T" }) {
-                     // We need to inject <T> before constructor
-                     // Replace "data class Name(" with "data class Name<T>("
                      val idx = fileContent.lastIndexOf("data class $name(")
                      if (idx != -1) {
                          fileContent.replace(idx, idx + "data class $name(".length, "data class $name<T>(")
@@ -324,7 +313,6 @@ open class GenerateContractTask : DefaultTask() {
     }
 
     private fun generateServicesAndRoutes(outputDir: File, routes: List<JsonElement>) {
-        // Group by service (first path segment)
         val serviceMap = mutableMapOf<String, MutableList<JsonElement>>()
 
         routes.forEach { route ->
@@ -334,22 +322,20 @@ open class GenerateContractTask : DefaultTask() {
             serviceMap.computeIfAbsent(serviceName) { mutableListOf() }.add(route)
         }
 
-        // Generate Services.kt
         val servicesContent = StringBuilder()
         servicesContent.append("package com.quizbackend.contracts.generated\n\n")
-        servicesContent.append("import com.quizbackend.contracts.generated.*\n\n") // Import DTOs
+        servicesContent.append("import com.quizbackend.contracts.generated.*\n\n")
 
-        // Generate Routes.kt
         val routesContent = StringBuilder()
         routesContent.append("package com.quizbackend.contracts.generated\n\n")
         routesContent.append("import io.ktor.server.application.*\n")
         routesContent.append("import io.ktor.server.routing.*\n")
         routesContent.append("import io.ktor.http.HttpMethod\n")
-        routesContent.append("import com.quizbackend.routing.defineRoute\n") // We will reuse defineRoute helper
-        routesContent.append("import com.quizbackend.routing.RouteDefinition\n\n")
+        routesContent.append("import com.quizbackend.routing.defineRoute\n")
+        routesContent.append("import com.quizbackend.routing.RouteDefinition\n")
+        routesContent.append("import com.quizbackend.configureRoute\n\n")
 
 
-        // Build configure function signature
         val serviceArgs = serviceMap.keys.joinToString(", ") { "${it}Service: ${it.replaceFirstChar { c -> c.uppercase() }}Service" }
         routesContent.append("fun Application.configureGeneratedRoutes($serviceArgs) {\n")
         routesContent.append("    val routes = listOf(\n")
@@ -367,43 +353,32 @@ open class GenerateContractTask : DefaultTask() {
                 val responseType = r["responseType"]!!.jsonPrimitive.content
                 val requiresAuth = r["requiresAuth"]?.jsonPrimitive?.boolean ?: false
 
-                // Determine function name
                 val segments = path.trim('/').split('/')
                 val lastSegment = segments.last()
                 val isParam = lastSegment.startsWith("{") && lastSegment.endsWith("}")
 
                 val methodNameBuilder = StringBuilder()
-                methodNameBuilder.append(method.lowercase().replaceFirstChar { it.uppercase() }) // Get, Post...
+                methodNameBuilder.append(method.lowercase().replaceFirstChar { it.uppercase() })
 
                 fun String.toPascalCase(): String {
                     return this.split('-', '_').joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
                 }
 
                 if (isParam) {
-                    // Use second to last + last param name (cleaned)
                     if (segments.size > 1) {
                         val prev = segments[segments.size - 2]
                         methodNameBuilder.append(prev.toPascalCase())
                     }
-                    // Clean param {id} -> Id
                     val paramName = lastSegment.trim('{', '}')
                     methodNameBuilder.append(paramName.toPascalCase())
                 } else {
                     methodNameBuilder.append(lastSegment.toPascalCase())
                 }
 
-                // Edge case: if generated name is just "Get", append ServiceName to avoid ambiguity?
-                // E.g. /questions -> GetQuestions.
-                // My logic: segments=['questions'], last='questions', not param. -> GetQuestions. Correct.
-
-                // Edge case: /auth/login -> segments=['auth','login']. last='login'. -> PostLogin. Correct.
-
                 val methodName = methodNameBuilder.toString()
 
                 servicesContent.append("    suspend fun $methodName(body: $bodyType, params: $paramsType): DTOResponse<$responseType>\n")
 
-                // Add to routes definition
-                // defineRoute<Body, Params, Response>(Method, Path, Auth) { body, params -> service.method(body, params) }
                 val methodEnum = when(method) {
                     "GET" -> "HttpMethod.Get"
                     "POST" -> "HttpMethod.Post"
@@ -421,21 +396,320 @@ open class GenerateContractTask : DefaultTask() {
         routesContent.append("    )\n\n")
         routesContent.append("    routing {\n")
         routesContent.append("        routes.forEach { def ->\n")
-        routesContent.append("            configureRoute(def)\n") // Assuming configureRoute is accessible (it is an extension method in Routing.kt, we might need to import it or make it available)
-        // Wait, configureRoute is in Routing.kt package com.quizbackend.
-        // We are in com.quizbackend.contracts.generated.
-        // We need to import com.quizbackend.configureRoute
-        // Checking Routing.kt... function signature: `fun <Body : Any, Params : DTOParams, Response : Any> Route.configureRoute(...)`
-        // It's a top level function in `com.quizbackend` package?
-        // File starts with `package com.quizbackend`.
-        // So yes.
-        routesContent.insert(routesContent.indexOf("import com.quizbackend.routing.RouteDefinition") + "import com.quizbackend.routing.RouteDefinition\n".length, "import com.quizbackend.configureRoute\n")
-
+        routesContent.append("            configureRoute(def)\n")
         routesContent.append("        }\n")
         routesContent.append("    }\n")
         routesContent.append("}\n")
 
         File(outputDir, "Services.kt").writeText(servicesContent.toString())
         File(outputDir, "Routes.kt").writeText(routesContent.toString())
+    }
+
+    // --- Dart Generation ---
+
+    private fun generateDartClient(projectDir: File, json: JsonObject) {
+        val dartRoot = File(projectDir, "dart_client")
+        dartRoot.mkdirs()
+
+        generateDartPubspec(dartRoot, json)
+
+        val libDir = File(dartRoot, "lib")
+        libDir.mkdirs()
+
+        val srcDir = File(libDir, "src")
+        srcDir.mkdirs()
+        val servicesDir = File(srcDir, "services")
+        servicesDir.mkdirs()
+
+        val enums = json["enums"]?.jsonObject ?: emptyMap()
+        generateDartEnums(srcDir, enums)
+
+        val dtos = json["dtos"]?.jsonObject ?: emptyMap()
+        generateDartDTOs(srcDir, dtos)
+
+        val routes = json["routes"]?.jsonArray ?: emptyList()
+        generateDartServices(servicesDir, routes, dtos)
+
+        generateDartClientEntryPoint(libDir, routes)
+    }
+
+    private fun generateDartPubspec(dartRoot: File, json: JsonObject) {
+        val name = "quiz_api_client"
+        val description = json["description"]?.jsonPrimitive?.content ?: "A Dart API client"
+        val version = json["version"]?.jsonPrimitive?.content ?: "1.0.0"
+
+        val content = """
+name: $name
+description: $description
+version: $version
+environment:
+  sdk: '>=2.17.0 <4.0.0'
+
+dependencies:
+  dio: ^5.0.0
+  json_annotation: ^4.8.0
+
+dev_dependencies:
+  build_runner: ^2.3.3
+  json_serializable: ^6.6.0
+  lints: ^2.0.0
+""".trimIndent()
+        File(dartRoot, "pubspec.yaml").writeText(content)
+    }
+
+    private fun generateDartEnums(outputDir: File, enums: Map<String, JsonElement>) {
+        val sb = StringBuilder()
+        sb.append("import 'package:json_annotation/json_annotation.dart';\n\n")
+
+        enums.forEach { (name, element) ->
+            val values = element.jsonObject["values"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+            sb.append("@JsonEnum()\n")
+            sb.append("enum $name {\n")
+            values.forEach { value ->
+                sb.append("  @JsonValue('$value')\n")
+                sb.append("  $value,\n")
+            }
+            sb.append("}\n\n")
+        }
+        File(outputDir, "enums.dart").writeText(sb.toString())
+    }
+
+    private fun generateDartDTOs(outputDir: File, dtos: Map<String, JsonElement>) {
+        val sb = StringBuilder()
+        sb.append("import 'package:json_annotation/json_annotation.dart';\n")
+        sb.append("import 'enums.dart';\n\n")
+        sb.append("part 'dtos.g.dart';\n\n")
+
+        dtos.forEach { (name, element) ->
+            val dtoObj = element.jsonObject
+            val inherits = dtoObj["inherits"]?.jsonPrimitive?.contentOrNull
+            val properties = dtoObj["properties"]?.jsonArray ?: emptyList()
+
+            val isGeneric = properties.any { it.jsonObject["type"]!!.jsonPrimitive.content == "T" }
+            val className = if (isGeneric) "$name<T>" else name
+
+            val annotation = if (isGeneric) "@JsonSerializable(genericArgumentFactories: true)" else "@JsonSerializable()"
+
+            sb.append("$annotation\n")
+            if (inherits != null) {
+                sb.append("class $className extends $inherits {\n")
+            } else {
+                sb.append("class $className {\n")
+            }
+
+            // Properties
+            properties.forEach { prop ->
+                val p = prop.jsonObject
+                val pName = p["name"]!!.jsonPrimitive.content
+                val pType = p["type"]!!.jsonPrimitive.content
+                val isNullable = p["isNullable"]?.jsonPrimitive?.boolean == true
+
+                val dartType = mapToDartType(pType)
+                sb.append("  final $dartType${if (isNullable) "?" else ""} $pName;\n")
+            }
+            sb.append("\n")
+
+            // Constructor
+            sb.append("  $className({")
+            properties.forEach { prop ->
+                 val pName = prop.jsonObject["name"]!!.jsonPrimitive.content
+                 val isNullable = prop.jsonObject["isNullable"]?.jsonPrimitive?.boolean == true
+                 if (!isNullable) {
+                     sb.append("required this.$pName, ")
+                 } else {
+                     sb.append("this.$pName, ")
+                 }
+            }
+            sb.append("});\n\n")
+
+            // Factory
+            if (isGeneric) {
+                sb.append("  factory $name.fromJson(Map<String, dynamic> json, T Function(Object? json) fromJsonT) => _\$${name}FromJson(json, fromJsonT);\n")
+                sb.append("  Map<String, dynamic> toJson(Object? Function(T value) toJsonT) => _\$${name}ToJson(this, toJsonT);\n")
+            } else {
+                sb.append("  factory $name.fromJson(Map<String, dynamic> json) => _\$${name}FromJson(json);\n")
+                sb.append("  Map<String, dynamic> toJson() => _\$${name}ToJson(this);\n")
+            }
+            sb.append("}\n\n")
+        }
+
+        File(outputDir, "dtos.dart").writeText(sb.toString())
+    }
+
+    private fun mapToDartType(type: String): String {
+        return when {
+            type == "Int" || type == "Long" -> "int"
+            type == "Double" || type == "Float" -> "double"
+            type == "Boolean" -> "bool"
+            type == "String" -> "String"
+            type.startsWith("List<") -> {
+                val inner = type.removePrefix("List<").removeSuffix(">")
+                "List<${mapToDartType(inner)}>"
+            }
+            type == "T" -> "T"
+            else -> type
+        }
+    }
+
+    private fun generateDartServices(outputDir: File, routes: List<JsonElement>, dtos: Map<String, JsonElement>) {
+        val serviceMap = mutableMapOf<String, MutableList<JsonElement>>()
+        routes.forEach { route ->
+            val path = route.jsonObject["path"]!!.jsonPrimitive.content
+            val segments = path.trim('/').split('/')
+            val serviceName = segments.firstOrNull() ?: "root"
+            serviceMap.computeIfAbsent(serviceName) { mutableListOf() }.add(route)
+        }
+
+        serviceMap.forEach { (serviceName, routesList) ->
+            val className = "${serviceName.replaceFirstChar { it.uppercase() }}Service"
+            val sb = StringBuilder()
+            sb.append("import 'package:dio/dio.dart';\n")
+            sb.append("import '../dtos.dart';\n")
+            sb.append("import '../enums.dart';\n\n")
+
+            sb.append("class $className {\n")
+            sb.append("  final Dio _dio;\n")
+            sb.append("  $className(this._dio);\n\n")
+
+            routesList.forEach { route ->
+                val r = route.jsonObject
+                val method = r["method"]!!.jsonPrimitive.content.lowercase()
+                val path = r["path"]!!.jsonPrimitive.content
+                val bodyType = r["bodyType"]!!.jsonPrimitive.content
+                val paramsType = r["paramsType"]!!.jsonPrimitive.content
+                val responseType = r["responseType"]!!.jsonPrimitive.content
+
+                // Function Name
+                val segments = path.trim('/').split('/')
+                val lastSegment = segments.last()
+                val isParam = lastSegment.startsWith("{")
+                 val methodNameBuilder = StringBuilder()
+                methodNameBuilder.append(method.lowercase().replaceFirstChar { it.uppercase() })
+
+                fun String.toPascalCase(): String {
+                    return this.split('-', '_').joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
+                }
+
+                if (isParam) {
+                    if (segments.size > 1) {
+                        val prev = segments[segments.size - 2]
+                        methodNameBuilder.append(prev.toPascalCase())
+                    }
+                    val paramName = lastSegment.trim('{', '}')
+                    methodNameBuilder.append(paramName.toPascalCase())
+                } else {
+                    methodNameBuilder.append(lastSegment.toPascalCase())
+                }
+                val methodName = methodNameBuilder.toString().replaceFirstChar { it.lowercase() }
+
+                // Params
+                val paramsDto = dtos[paramsType]?.jsonObject
+                val paramProperties = paramsDto?.get("properties")?.jsonArray ?: emptyList()
+
+                val args = mutableListOf<String>()
+                val pathReplacements = mutableListOf<String>()
+                val queryParams = mutableListOf<String>()
+
+                // Handle Body
+                if (method in listOf("post", "put", "patch", "delete") && bodyType != "EmptyRequestDTO") {
+                    args.add("required $bodyType body")
+                }
+
+                paramProperties.forEach { prop ->
+                    val p = prop.jsonObject
+                    val pName = p["name"]!!.jsonPrimitive.content
+                    val pType = p["type"]!!.jsonPrimitive.content
+                    val isNullable = p["isNullable"]?.jsonPrimitive?.boolean == true
+                    val dartType = mapToDartType(pType)
+
+                    val isPath = path.contains("{$pName}")
+                    if (isPath) {
+                        pathReplacements.add(pName)
+                        args.add("required $dartType $pName")
+                    } else {
+                        queryParams.add(pName)
+                        if (isNullable) {
+                            args.add("$dartType? $pName")
+                        } else {
+                            args.add("required $dartType $pName")
+                        }
+                    }
+                }
+
+                sb.append("  Future<DTOResponse<$responseType>> $methodName({${args.joinToString(", ")}}) async {\n")
+
+                // Construct path
+                var dartPath = "'$path'"
+                if (pathReplacements.isNotEmpty()) {
+                    dartPath = "'$path'"
+                    pathReplacements.forEach { pName ->
+                         dartPath = dartPath.replace("{$pName}", "\$$pName")
+                    }
+                }
+
+                sb.append("    final response = await _dio.$method($dartPath")
+
+                if (method in listOf("post", "put", "patch", "delete") && bodyType != "EmptyRequestDTO") {
+                    sb.append(", data: body.toJson()")
+                }
+
+                if (queryParams.isNotEmpty()) {
+                    sb.append(", queryParameters: {")
+                    queryParams.forEach { qParam ->
+                         sb.append("'$qParam': $qParam, ")
+                    }
+                    sb.append("}")
+                }
+
+                sb.append(");\n")
+                sb.append("    return DTOResponse<$responseType>.fromJson(response.data, (json) => $responseType.fromJson(json as Map<String, dynamic>));\n")
+                sb.append("  }\n\n")
+            }
+            sb.append("}\n")
+            File(outputDir, "${serviceName}_service.dart").writeText(sb.toString())
+        }
+    }
+
+    private fun generateDartClientEntryPoint(libDir: File, routes: List<JsonElement>) {
+        val serviceNames = routes.map {
+            val path = it.jsonObject["path"]!!.jsonPrimitive.content
+            val segments = path.trim('/').split('/')
+            segments.firstOrNull() ?: "root"
+        }.distinct()
+
+        val sb = StringBuilder()
+        sb.append("import 'package:dio/dio.dart';\n")
+        serviceNames.forEach {
+             sb.append("import 'src/services/${it}_service.dart';\n")
+        }
+        sb.append("export 'src/dtos.dart';\n")
+        sb.append("export 'src/enums.dart';\n")
+        serviceNames.forEach {
+             sb.append("export 'src/services/${it}_service.dart';\n")
+        }
+        sb.append("\n")
+
+        sb.append("class ApiClient {\n")
+        sb.append("  final Dio dio;\n")
+        sb.append("  late final String baseUrl;\n\n")
+
+        serviceNames.forEach {
+             val className = "${it.replaceFirstChar { c -> c.uppercase() }}Service"
+             sb.append("  late final $className ${it}Service;\n")
+        }
+        sb.append("\n")
+
+        sb.append("  ApiClient({String? baseUrl, Dio? dio}) : this.dio = dio ?? Dio() {\n")
+        sb.append("    this.baseUrl = baseUrl ?? '';\n")
+        sb.append("    this.dio.options.baseUrl = this.baseUrl;\n")
+
+        serviceNames.forEach {
+             val className = "${it.replaceFirstChar { c -> c.uppercase() }}Service"
+             sb.append("    ${it}Service = $className(this.dio);\n")
+        }
+        sb.append("  }\n")
+        sb.append("}\n")
+
+        File(libDir, "api_client.dart").writeText(sb.toString())
     }
 }
