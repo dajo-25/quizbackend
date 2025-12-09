@@ -1,8 +1,10 @@
 services:
   quiz-backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      - STORAGE_JDBCURL=jdbc:sqlite:/data/quiz.db
+      STORAGE_JDBCURL: jdbc:sqlite:/data/quiz.db
     ports:
       - "8079:8080"
     volumes:
