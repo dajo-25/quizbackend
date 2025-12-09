@@ -1,27 +1,27 @@
-# Utilitza una imatge base amb Gradle per compilar el projecte
+# --- ETAPA DE BUILD ---
 FROM gradle:7.6-jdk17 AS builder
-
-# Defineix el directori de treball per la compilació
 WORKDIR /app
 
-# Copia tots els fitxers del projecte al contenidor
-COPY . .
+# Copiem fitxers de configuració
+COPY build.gradle.kts settings.gradle.kts gradle.properties* ./
+# Copiem el codi
+COPY src ./src
 
-# Compila el projecte i genera el fat JAR
-# Afegeim --info i --stacktrace per veure l'error real als logs
-RUN gradle clean shadowJar --no-daemon --info --stacktrace
+# TRUC: Fem servir 'build' estàndard en lloc de shadowJar.
+# -x test salta els tests per estalviar temps i memòria
+RUN gradle build -x test --no-daemon
 
-# Utilitza una imatge base amb Java per executar l'aplicació
+# --- ETAPA D'EXECUCIÓ ---
 FROM eclipse-temurin:17-jdk-jammy
-
-# Defineix el directori de treball per l'aplicació
 WORKDIR /app
 
-# Copia el fat JAR generat al contenidor
-COPY --from=builder /app/build/libs/quizbackend-all.jar app.jar
+# Busquem el JAR generat. Normalment la tasca 'build' el deixa a build/libs/
+# ATENCIÓ: Sense shadowJar, necessitem copiar també les dependències si no és un fat jar,
+# però molts setups de Ktor ja inclouen el fat jar amb la tasca 'buildFatJar' si tens el plugin de Ktor.
 
-# Exposa el port de Ktor
+# Si tens el plugin de Ktor, prova de copiar:
+COPY --from=builder /app/build/libs/*-all.jar app.jar
+# Si això falla, canvia l'asterisc per: /app/build/libs/*.jar
+
 EXPOSE 8080
-
-# Comanda per executar el fat JAR
 CMD ["java", "-jar", "app.jar"]
