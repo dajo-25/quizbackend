@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Compila el projecte i genera el fat JAR
-RUN gradle clean buildFatJar --no-daemon
+RUN gradle clean shadowJar --no-daemon
 
 # Utilitza una imatge base amb Java per executar l'aplicació
 FROM eclipse-temurin:17-jdk-jammy
