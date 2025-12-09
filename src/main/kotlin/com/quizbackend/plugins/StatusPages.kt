@@ -1,5 +1,6 @@
 package com.quizbackend.plugins
 
+import com.quizbackend.contracts.generated.DTOResponse
 import com.quizbackend.contracts.generated.ErrorDetailsDTO
 import com.quizbackend.contracts.generated.ErrorType
 import io.ktor.http.*
@@ -12,54 +13,86 @@ fun Application.configureStatusPages() {
     install(StatusPages) {
         status(HttpStatusCode.NotFound) { call, status ->
             call.respond(
-                HttpStatusCode.NotFound,
-                ErrorDetailsDTO(ErrorType.ROUTE_NOT_EXISTS_OR_BAD_IMPLEMENTED, "Route not found or bad implemented")
+                HttpStatusCode.OK,
+                DTOResponse<Unit>(
+                    success = false,
+                    message = "Route not found or bad implemented",
+                    error = ErrorDetailsDTO(ErrorType.ROUTE_NOT_EXISTS_OR_BAD_IMPLEMENTED, "Route not found or bad implemented")
+                )
             )
         }
         status(HttpStatusCode.Unauthorized) { call, status ->
             call.respond(
-                HttpStatusCode.Unauthorized,
-                ErrorDetailsDTO(ErrorType.UNAUTHORIZED, "Unauthorized")
+                HttpStatusCode.OK,
+                DTOResponse<Unit>(
+                    success = false,
+                    message = "Unauthorized",
+                    error = ErrorDetailsDTO(ErrorType.UNAUTHORIZED, "Unauthorized")
+                )
             )
         }
         status(HttpStatusCode.Forbidden) { call, status ->
             call.respond(
-                HttpStatusCode.Forbidden,
-                ErrorDetailsDTO(ErrorType.FORBIDDEN, "Forbidden")
+                HttpStatusCode.OK,
+                DTOResponse<Unit>(
+                    success = false,
+                    message = "Forbidden",
+                    error = ErrorDetailsDTO(ErrorType.FORBIDDEN, "Forbidden")
+                )
             )
         }
         status(HttpStatusCode.MethodNotAllowed) { call, status ->
             call.respond(
-                HttpStatusCode.MethodNotAllowed,
-                ErrorDetailsDTO(ErrorType.METHOD_NOT_ALLOWED, "Method not allowed")
+                HttpStatusCode.OK,
+                DTOResponse<Unit>(
+                    success = false,
+                    message = "Method not allowed",
+                    error = ErrorDetailsDTO(ErrorType.METHOD_NOT_ALLOWED, "Method not allowed")
+                )
             )
         }
         status(HttpStatusCode.InternalServerError) { call, status ->
             call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, "Internal server error")
+                HttpStatusCode.OK,
+                DTOResponse<Unit>(
+                    success = false,
+                    message = "Internal server error",
+                    error = ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, "Internal server error")
+                )
             )
         }
 
         exception<BadRequestException> { call, cause ->
             call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorDetailsDTO(ErrorType.BAD_REQUEST, cause.message ?: "Bad Request")
+                HttpStatusCode.OK,
+                DTOResponse<Unit>(
+                    success = false,
+                    message = cause.message ?: "Bad Request",
+                    error = ErrorDetailsDTO(ErrorType.BAD_REQUEST, cause.message ?: "Bad Request")
+                )
             )
         }
 
         exception<MissingRequestParameterException> { call, cause ->
             call.respond(
-                HttpStatusCode.BadRequest,
-                ErrorDetailsDTO(ErrorType.BAD_REQUEST, "Missing parameter: ${cause.parameterName}")
+                HttpStatusCode.OK,
+                DTOResponse<Unit>(
+                    success = false,
+                    message = "Missing parameter: ${cause.parameterName}",
+                    error = ErrorDetailsDTO(ErrorType.BAD_REQUEST, "Missing parameter: ${cause.parameterName}")
+                )
             )
         }
 
         exception<Throwable> { call, cause ->
             cause.printStackTrace() // Log the error
             call.respond(
-                HttpStatusCode.InternalServerError,
-                ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, "Internal server error")
+                HttpStatusCode.OK,
+                DTOResponse<Unit>(
+                    success = false,
+                    message = "Internal server error",
+                    error = ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, "Internal server error")
+                )
             )
         }
     }
