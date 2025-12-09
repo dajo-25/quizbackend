@@ -8,7 +8,8 @@ WORKDIR /app
 COPY . .
 
 # Compila el projecte i genera el fat JAR
-RUN gradle clean shadowJar --no-daemon
+# Afegeim --info i --stacktrace per veure l'error real als logs
+RUN gradle clean shadowJar --no-daemon --info --stacktrace
 
 # Utilitza una imatge base amb Java per executar l'aplicació
 FROM eclipse-temurin:17-jdk-jammy
