@@ -14,7 +14,7 @@ COPY gradle.properties .
 RUN chmod +x gradlew
 
 # Download dependencies (this step caches dependencies)
-RUN ./gradlew dependencies --no-daemon
+# RUN ./gradlew dependencies --no-daemon
 
 # Copy the source code
 COPY src/ src/
