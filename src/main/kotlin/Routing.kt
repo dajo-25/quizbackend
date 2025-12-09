@@ -82,7 +82,7 @@ fun <Body : Any, Params : DTOParams, Response : Any> Route.configureRoute(
                 if (response.success) {
                     call.respond(HttpStatusCode.OK, response, io.ktor.util.reflect.TypeInfo(def.returnType.classifier as KClass<*>, def.returnType))
                 } else {
-                    call.respond(HttpStatusCode.BadRequest, response, io.ktor.util.reflect.TypeInfo(def.returnType.classifier as KClass<*>, def.returnType))
+                    call.respond(HttpStatusCode.OK, response, io.ktor.util.reflect.TypeInfo(def.returnType.classifier as KClass<*>, def.returnType))
                 }
             } catch (e: Exception) {
                 val errorDetails = when {
@@ -104,7 +104,7 @@ fun <Body : Any, Params : DTOParams, Response : Any> Route.configureRoute(
                         e.message?.let { ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, it) }
                     }
                 }
-                call.respond(HttpStatusCode.BadRequest, DTOResponse<Unit>(false, null, "Error: ${errorDetails?.message}", errorDetails))
+                call.respond(HttpStatusCode.OK, DTOResponse<Unit>(false, null, "Error: ${errorDetails?.message}", errorDetails))
             }
         }
     }
