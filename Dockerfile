@@ -1,38 +1,29 @@
-# --- ETAPA 1: Builder ---
-# En lloc d'una imatge de Gradle, usem la mateixa de Java que farem servir després.
 FROM eclipse-temurin:17-jdk-jammy AS builder
 
 WORKDIR /app
 
-# Copiem els fitxers del gradle wrapper
-COPY gradle/ gradle/
-COPY gradlew .
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-COPY gradle.properties* .
+# Copiem tot el projecte
+COPY . .
 
-# Donem permisos d'execució al wrapper
+# --- SOLUCIÓ DE L'ERROR 127 ---
+# 1. Donem permisos d'execució (+x)
 RUN chmod +x ./gradlew
 
-# Aquesta línia és màgica: descarrega només les dependències primer.
-# Si falla aquí, sabrem que és un problema de xarxa/repositoris.
+# 2. Arreglem els salts de línia de Windows (CRLF) a Linux (LF)
+# Això elimina els caràcters invisibles que fan que Linux no trobi la comanda
+RUN sed -i 's/\r$//' gradlew
+
+# -----------------------------
+
+# Ara sí, descarreguem dependències
 RUN ./gradlew dependencies --no-daemon
 
-# Copiem la resta del codi
-COPY src ./src
-
-# Compilem usant el wrapper (assegura mateixa versió que local).
-# Afegim -x test per estalviar memòria i temps.
+# I compilem (recorda: shadowJar o build, segons el que tinguis)
 RUN ./gradlew shadowJar --no-daemon -x test
 
-# --- ETAPA 2: Runner ---
+# --- ETAPA RUNNER ---
 FROM eclipse-temurin:17-jdk-jammy
-
 WORKDIR /app
-
-# Copiem el JAR. L'asterisc ens salva d'errors de noms.
 COPY --from=builder /app/build/libs/*-all.jar app.jar
-
 EXPOSE 8080
-
 CMD ["java", "-jar", "app.jar"]
