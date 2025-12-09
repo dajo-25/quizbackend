@@ -1,27 +1,38 @@
-# --- ETAPA DE BUILD ---
-FROM gradle:7.6-jdk17 AS builder
+# --- ETAPA 1: Builder ---
+# En lloc d'una imatge de Gradle, usem la mateixa de Java que farem servir després.
+FROM eclipse-temurin:17-jdk-jammy AS builder
+
 WORKDIR /app
 
-# Copiem fitxers de configuració
-COPY build.gradle.kts settings.gradle.kts gradle.properties* ./
-# Copiem el codi
+# Copiem els fitxers del gradle wrapper
+COPY gradle/ gradle/
+COPY gradlew .
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
+COPY gradle.properties* .
+
+# Donem permisos d'execució al wrapper
+RUN chmod +x ./gradlew
+
+# Aquesta línia és màgica: descarrega només les dependències primer.
+# Si falla aquí, sabrem que és un problema de xarxa/repositoris.
+RUN ./gradlew dependencies --no-daemon
+
+# Copiem la resta del codi
 COPY src ./src
 
-# TRUC: Fem servir 'build' estàndard en lloc de shadowJar.
-# -x test salta els tests per estalviar temps i memòria
-RUN gradle build -x test --no-daemon
+# Compilem usant el wrapper (assegura mateixa versió que local).
+# Afegim -x test per estalviar memòria i temps.
+RUN ./gradlew shadowJar --no-daemon -x test
 
-# --- ETAPA D'EXECUCIÓ ---
+# --- ETAPA 2: Runner ---
 FROM eclipse-temurin:17-jdk-jammy
+
 WORKDIR /app
 
-# Busquem el JAR generat. Normalment la tasca 'build' el deixa a build/libs/
-# ATENCIÓ: Sense shadowJar, necessitem copiar també les dependències si no és un fat jar,
-# però molts setups de Ktor ja inclouen el fat jar amb la tasca 'buildFatJar' si tens el plugin de Ktor.
-
-# Si tens el plugin de Ktor, prova de copiar:
+# Copiem el JAR. L'asterisc ens salva d'errors de noms.
 COPY --from=builder /app/build/libs/*-all.jar app.jar
-# Si això falla, canvia l'asterisc per: /app/build/libs/*.jar
 
 EXPOSE 8080
+
 CMD ["java", "-jar", "app.jar"]
