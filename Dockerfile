@@ -1,38 +1,26 @@
-# Stage 1: Build the application
-FROM eclipse-temurin:17-jdk-alpine AS build
+# Utilitza una imatge base amb Gradle per compilar el projecte
 FROM gradle:7.6-jdk17 AS builder
 
+# Defineix el directori de treball per la compilació
 WORKDIR /app
 
-# Copy gradle wrapper and build files
-COPY gradlew .
-COPY gradle/ gradle/
-COPY build.gradle.kts .
-COPY settings.gradle.kts .
-COPY gradle.properties .
+# Copia tots els fitxers del projecte al contenidor
+COPY . .
 
-# Grant execution rights to the gradlew script
-RUN chmod +x gradlew
-
-# Download dependencies (this step caches dependencies)
-# RUN ./gradlew dependencies --no-daemon
-
-# Copy the source code
-COPY src/ src/
-
-# Build the fat jar
+# Compila el projecte i genera el fat JAR
 RUN gradle clean buildFatJar --no-daemon
 
-# Stage 2: Run the application
-FROM eclipse-temurin:17-jre-alpine
+# Utilitza una imatge base amb Java per executar l'aplicació
+FROM eclipse-temurin:17-jdk-jammy
 
+# Defineix el directori de treball per l'aplicació
 WORKDIR /app
 
-# Copy the fat jar from the build stage
-COPY --from=builder /app/build/libs/quizbackend-all.jar /app/quizbackend-all.jar
+# Copia el fat JAR generat al contenidor
+COPY --from=builder /app/build/libs/quizbackend-all.jar app.jar
 
-# Expose the application port
+# Exposa el port de Ktor
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "quizbackend-all.jar"]
+# Comanda per executar el fat JAR
+CMD ["java", "-jar", "app.jar"]
