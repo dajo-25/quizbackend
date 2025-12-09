@@ -1,5 +1,6 @@
 # Stage 1: Build the application
 FROM eclipse-temurin:17-jdk-alpine AS build
+FROM gradle:7.6-jdk17 AS builder
 
 WORKDIR /app
 
@@ -20,7 +21,7 @@ RUN chmod +x gradlew
 COPY src/ src/
 
 # Build the fat jar
-RUN ./gradlew buildFatJar --no-daemon
+RUN gradle clean buildFatJar --no-daemon
 
 # Stage 2: Run the application
 FROM eclipse-temurin:17-jre-alpine
