@@ -29,7 +29,7 @@ FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
 # Copy the fat jar from the build stage
-COPY --from=build /app/build/libs/quizbackend-all.jar /app/quizbackend-all.jar
+COPY --from=builder /app/build/libs/quizbackend-all.jar /app/quizbackend-all.jar
 
 # Expose the application port
 EXPOSE 8080
