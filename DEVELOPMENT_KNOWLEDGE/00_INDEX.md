@@ -24,3 +24,7 @@ This directory contains the collective intelligence of the project. It serves as
 *   **[05_WORKFLOW_CONTRACT.md](./05_WORKFLOW_CONTRACT.md)**
     *   *Purpose:* Defines the "Who" and "Rules of Engagement".
     *   *Contents:* How the AI and Human interact, Definition of Done, Commit message standards.
+
+*   **[06_PRODUCT_CONTEXT.md](./06_PRODUCT_CONTEXT.md)**
+    *   *Purpose:* Defines the "User" and "Product".
+    *   *Contents:* User stories, Use cases, Product vision, Functional requirements.
