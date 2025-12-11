@@ -2,6 +2,8 @@ package com.quizbackend.features.users
 
 import com.quizbackend.features.users.Users
 import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.inList
 import org.jetbrains.exposed.sql.transactions.transaction
 
 class UsersService {
@@ -59,6 +61,25 @@ class UsersService {
                 it[Users.surname] = surname
                 it[Users.username] = username
             }
+        }
+    }
+
+    fun delete(id: Int) {
+        transaction {
+            // Manual cascading for production readiness
+            // Delete devices
+            com.quizbackend.features.devices.Devices.deleteWhere { user eq id }
+            // Delete collection access
+            com.quizbackend.features.quiz.collections.models.CollectionAccess.deleteWhere { userId eq id }
+            // Delete collections owned by user (and their questions links)
+            val userCollections = com.quizbackend.features.quiz.collections.models.Collections.selectAll().where { com.quizbackend.features.quiz.collections.models.Collections.creatorId eq id }.map { it[com.quizbackend.features.quiz.collections.models.Collections.id].value }
+            if (userCollections.isNotEmpty()) {
+                com.quizbackend.features.quiz.collections.models.CollectionQuestions.deleteWhere { collectionId inList userCollections }
+                com.quizbackend.features.quiz.collections.models.CollectionAccess.deleteWhere { collectionId inList userCollections }
+                com.quizbackend.features.quiz.collections.models.Collections.deleteWhere { creatorId eq id }
+            }
+            // Finally delete user
+            Users.deleteWhere { Users.id eq id }
         }
     }
 }

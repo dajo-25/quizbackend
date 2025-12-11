@@ -1,18 +1,13 @@
 # Development Status
 
 ## Auth Feature
-* **Login/Signup:** 90% Ready. Logic is implemented, connected to database, handles password comparison and token generation.
-    *   *Missing:* Proper email format validation (current check is minimal).
+* **Login/Signup:** 100% Ready. Logic is implemented, connected to database. Signup validates email and returns token.
 * **Recover/Verify:** 80% Ready. Logic implemented with `EmailSender`.
     *   *Missing:* Verification of `EmailSender` configuration in production environment.
-* **Logout:** 50% Ready. Domain logic exists (`AuthDomainService.logout` disables device), but the API contract implementation is mocked and does not call it.
-    *   *Missing:* Connection between API and Domain Service.
-* **Delete Account:** 10% Ready. Endpoint is mocked with a simulated message.
-    *   *Missing:* Real logic to remove user data or mark as deleted.
-* **Change Password:** 20% Ready. Domain logic exists but is not called by the contract implementation.
-    *   *Missing:* Connection between API and Domain Service.
-* **Profile/Status:** 10% Ready. API endpoints are mocked because the `userId` context is missing from the generated interface, preventing the service from knowing which user is requesting the data.
-    *   *Missing:* `userId` context in generated contracts.
+* **Logout:** 100% Ready. Domain logic connected to API via `UserContext`.
+* **Delete Account:** 100% Ready. Domain logic connected to API via `UserContext`.
+* **Change Password:** 100% Ready. Domain logic connected to API via `UserContext`.
+* **Profile/Status:** 100% Ready. `GetStatus` is implemented. `Profile` feature might still need work in `ProfileContractImpl` but Auth part is done.
 
 ## Quiz Feature
 ### Questions
@@ -40,4 +35,4 @@
 * **Database:** SQLite is set up with basic tables for Users, Devices, Questions, Collections.
     *   *Missing:* Tables for Marks, Friends, Answers (relational), Localizations.
 * **Email:** `JavaxEmailSender` implementation exists.
-* **API Contract:** Defined and generates code, but generated interfaces lack `userId` context for authenticated routes, blocking implementation of Profile, Logout, etc.
+* **API Contract:** Defined and generates code. `UserContext` mechanism added to support authenticated routes.

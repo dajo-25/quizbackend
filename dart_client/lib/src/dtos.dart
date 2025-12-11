@@ -284,8 +284,9 @@ class SignupRequestDTO {
   final String name;
   final String surname;
   final String passwordHash;
+  final String uniqueId;
 
-  SignupRequestDTO({required this.email, required this.username, required this.name, required this.surname, required this.passwordHash, });
+  SignupRequestDTO({required this.email, required this.username, required this.name, required this.surname, required this.passwordHash, required this.uniqueId, });
 
   factory SignupRequestDTO.fromJson(Map<String, dynamic> json) => _$SignupRequestDTOFromJson(json);
   Map<String, dynamic> toJson() => _$SignupRequestDTOToJson(this);

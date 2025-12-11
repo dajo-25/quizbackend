@@ -10,7 +10,7 @@ import com.quizbackend.configureRoute
 fun Application.configureGeneratedRoutes(authService: AuthService, questionsService: QuestionsService, collectionsService: CollectionsService, communitiesService: CommunitiesService, marksService: MarksService, devicesService: DevicesService, profileService: ProfileService) {
     val routes = listOf(
         defineRoute<LoginRequestDTO, EmptyParamsDTO, LoginResponseDTO>(HttpMethod.Post, "/auth/login", requiresAuth = false) { body, params -> authService.PostLogin(body, params) },
-        defineRoute<SignupRequestDTO, EmptyParamsDTO, GenericResponseDTO>(HttpMethod.Post, "/auth/signup", requiresAuth = false) { body, params -> authService.PostSignup(body, params) },
+        defineRoute<SignupRequestDTO, EmptyParamsDTO, LoginResponseDTO>(HttpMethod.Post, "/auth/signup", requiresAuth = false) { body, params -> authService.PostSignup(body, params) },
         defineRoute<EmptyRequestDTO, EmptyParamsDTO, GenericResponseDTO>(HttpMethod.Post, "/auth/logout", requiresAuth = true) { body, params -> authService.PostLogout(body, params) },
         defineRoute<EmptyRequestDTO, EmptyParamsDTO, MessageResponseDTO>(HttpMethod.Delete, "/auth/account", requiresAuth = true) { body, params -> authService.DeleteAccount(body, params) },
         defineRoute<RecoverPasswordRequestDTO, EmptyParamsDTO, MessageResponseDTO>(HttpMethod.Post, "/auth/recover", requiresAuth = false) { body, params -> authService.PostRecover(body, params) },

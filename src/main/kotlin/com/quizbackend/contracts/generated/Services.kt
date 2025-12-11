@@ -4,7 +4,7 @@ import com.quizbackend.contracts.generated.*
 
 interface AuthService {
     suspend fun PostLogin(body: LoginRequestDTO, params: EmptyParamsDTO): DTOResponse<LoginResponseDTO>
-    suspend fun PostSignup(body: SignupRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO>
+    suspend fun PostSignup(body: SignupRequestDTO, params: EmptyParamsDTO): DTOResponse<LoginResponseDTO>
     suspend fun PostLogout(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO>
     suspend fun DeleteAccount(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<MessageResponseDTO>
     suspend fun PostRecover(body: RecoverPasswordRequestDTO, params: EmptyParamsDTO): DTOResponse<MessageResponseDTO>
