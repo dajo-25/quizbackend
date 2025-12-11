@@ -18,7 +18,7 @@
       "path": "/auth/signup",
       "bodyType": "SignupRequestDTO",
       "paramsType": "EmptyParamsDTO",
-      "responseType": "GenericResponseDTO",
+      "responseType": "LoginResponseDTO",
       "requiresAuth": false
     },
     {
@@ -404,7 +404,8 @@
         { "name": "username", "type": "String", "isNullable": false },
         { "name": "name", "type": "String", "isNullable": false },
         { "name": "surname", "type": "String", "isNullable": false },
-        { "name": "passwordHash", "type": "String", "isNullable": false }
+        { "name": "passwordHash", "type": "String", "isNullable": false },
+        { "name": "uniqueId", "type": "String", "isNullable": false }
       ]
     },
     "MessageDataDTO": {
@@ -563,7 +564,8 @@
       "properties": [
         { "name": "name", "type": "String", "isNullable": false },
         { "name": "description", "type": "String", "isNullable": false },
-        { "name": "isPublic", "type": "Boolean", "isNullable": false }
+        { "name": "isPublic", "type": "Boolean", "isNullable": false },
+        { "name": "questionIds", "type": "List<Int>", "isNullable": false }
       ]
     },
     "IdDataDTO": {
@@ -577,7 +579,8 @@
       "properties": [
         { "name": "name", "type": "String", "isNullable": false },
         { "name": "description", "type": "String", "isNullable": false },
-        { "name": "isPublic", "type": "Boolean", "isNullable": false }
+        { "name": "isPublic", "type": "Boolean", "isNullable": false },
+        { "name": "questionIds", "type": "List<Int>", "isNullable": false }
       ]
     },
     "MarkDataDTO": {

@@ -11,9 +11,9 @@ class AuthService {
     return DTOResponse<LoginResponseDTO>.fromJson(response.data, (json) => LoginResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<GenericResponseDTO>> postSignup({required SignupRequestDTO body}) async {
+  Future<DTOResponse<LoginResponseDTO>> postSignup({required SignupRequestDTO body}) async {
     final response = await _dio.post('/auth/signup', data: body.toJson());
-    return DTOResponse<GenericResponseDTO>.fromJson(response.data, (json) => GenericResponseDTO.fromJson(json as Map<String, dynamic>));
+    return DTOResponse<LoginResponseDTO>.fromJson(response.data, (json) => LoginResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
   Future<DTOResponse<GenericResponseDTO>> postLogout({}) async {

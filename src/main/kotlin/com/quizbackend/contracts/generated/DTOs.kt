@@ -186,7 +186,8 @@ data class SignupRequestDTO(
     val username: String,
     val name: String,
     val surname: String,
-    val passwordHash: String
+    val passwordHash: String,
+    val uniqueId: String
 )
 
 @Serializable
@@ -325,7 +326,8 @@ data class CollectionDetailDataDTO(
 data class CreateCollectionRequestDTO(
     val name: String,
     val description: String,
-    val isPublic: Boolean
+    val isPublic: Boolean,
+    val questionIds: List<Int>
 )
 
 @Serializable
@@ -337,7 +339,8 @@ data class IdDataDTO(
 data class UpdateCollectionRequestDTO(
     val name: String,
     val description: String,
-    val isPublic: Boolean
+    val isPublic: Boolean,
+    val questionIds: List<Int>
 )
 
 @Serializable
