@@ -28,3 +28,7 @@ This directory contains the collective intelligence of the project. It serves as
 *   **[06_PRODUCT_CONTEXT.md](./06_PRODUCT_CONTEXT.md)**
     *   *Purpose:* Defines the "User" and "Product".
     *   *Contents:* User stories, Use cases, Product vision, Functional requirements.
+
+*   **[07_ROADMAP_PERSPECTIVE.md](./07_ROADMAP_PERSPECTIVE.md)**
+    *   *Purpose:* Defines the "Future" and "Strategic Views".
+    *   *Contents:* RFCs, Architectural proposals, Long-term vision discussions.

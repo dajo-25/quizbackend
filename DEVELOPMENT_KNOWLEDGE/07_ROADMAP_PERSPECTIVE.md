@@ -1,4 +1,4 @@
-# Discussion: Usability Endpoints & API Shortcuts
+# Roadmap Perspective: Usability Endpoints & API Shortcuts
 
 ## Executive Summary
 The proposal to add "shortcut" or specific action endpoints (e.g., "add question to collection", "move question", "duplicate collection") is **strongly recommended** from a software engineering perspective.
