@@ -6,8 +6,8 @@ class QuestionsService {
   final Dio _dio;
   QuestionsService(this._dio);
 
-  Future<DTOResponse<QuestionListResponseDTO>> getQuestions({required int page}) async {
-    final response = await _dio.get('/questions', queryParameters: {'page': page, });
+  Future<DTOResponse<QuestionListResponseDTO>> getQuestions({required int page, String? locale}) async {
+    final response = await _dio.get('/questions', queryParameters: {'page': page, 'locale': locale, });
     return DTOResponse<QuestionListResponseDTO>.fromJson(response.data, (json) => QuestionListResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
@@ -16,8 +16,8 @@ class QuestionsService {
     return DTOResponse<GenericResponseDTO>.fromJson(response.data, (json) => GenericResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<QuestionDataResponseDTO>> getQuestionsId({required int id}) async {
-    final response = await _dio.get('/questions/$id');
+  Future<DTOResponse<QuestionDataResponseDTO>> getQuestionsId({required int id, String? locale}) async {
+    final response = await _dio.get('/questions/$id', queryParameters: {'locale': locale, });
     return DTOResponse<QuestionDataResponseDTO>.fromJson(response.data, (json) => QuestionDataResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
@@ -31,8 +31,8 @@ class QuestionsService {
     return DTOResponse<GenericResponseDTO>.fromJson(response.data, (json) => GenericResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<QuestionListResponseDTO>> getBatch({required List<int> ids}) async {
-    final response = await _dio.get('/questions/batch', queryParameters: {'ids': ids, });
+  Future<DTOResponse<QuestionListResponseDTO>> getBatch({required List<int> ids, String? locale}) async {
+    final response = await _dio.get('/questions/batch', queryParameters: {'ids': ids, 'locale': locale, });
     return DTOResponse<QuestionListResponseDTO>.fromJson(response.data, (json) => QuestionListResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 

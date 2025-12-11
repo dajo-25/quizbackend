@@ -96,7 +96,7 @@ class QuestionsDomainService {
              }
 
              // Update Question Localizations: Delete all and re-insert (simplest strategy)
-             Localizations.deleteWhere { (entityId eq id) and (entityType eq "QUESTION") }
+             Localizations.deleteWhere { (Localizations.entityId eq id) and (Localizations.entityType eq "QUESTION") }
              dto.localizations.forEach { loc ->
                  Localizations.insert {
                      it[entityId] = id
@@ -111,8 +111,8 @@ class QuestionsDomainService {
              val answerIds = Answers.select(Answers.id).where { Answers.questionId eq id }.map { it[Answers.id].value }
 
              if (answerIds.isNotEmpty()) {
-                Localizations.deleteWhere { (entityId inList answerIds) and (entityType eq "ANSWER") }
-                Answers.deleteWhere { questionId eq id }
+                Localizations.deleteWhere { (Localizations.entityId inList answerIds) and (Localizations.entityType eq "ANSWER") }
+                Answers.deleteWhere { Answers.questionId eq id }
              }
 
              dto.answers.forEachIndexed { index, aDto ->
@@ -137,16 +137,16 @@ class QuestionsDomainService {
     suspend fun deleteQuestion(id: Int): Boolean {
         return transaction {
             // Delete Localizations for Question
-            Localizations.deleteWhere { (entityId eq id) and (entityType eq "QUESTION") }
+            Localizations.deleteWhere { (Localizations.entityId eq id) and (Localizations.entityType eq "QUESTION") }
 
             // Delete Localizations for Answers
             val answerIds = Answers.select(Answers.id).where { Answers.questionId eq id }.map { it[Answers.id].value }
             if (answerIds.isNotEmpty()) {
-                Localizations.deleteWhere { (entityId inList answerIds) and (entityType eq "ANSWER") }
+                Localizations.deleteWhere { (Localizations.entityId inList answerIds) and (Localizations.entityType eq "ANSWER") }
             }
 
             // Delete Answers
-            Answers.deleteWhere { questionId eq id }
+            Answers.deleteWhere { Answers.questionId eq id }
 
             // Delete Question
             val count = Questions.deleteWhere { Questions.id eq id }

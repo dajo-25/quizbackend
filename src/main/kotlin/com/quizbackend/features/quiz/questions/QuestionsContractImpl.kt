@@ -8,17 +8,16 @@ class QuestionsContractImpl : QuestionsService {
     private val domainService = QuestionsDomainService()
 
     override suspend fun GetQuestions(body: EmptyRequestDTO, params: SearchQuestionsParamsDTO): DTOResponse<QuestionListResponseDTO> {
-        // TODO: Extract locale from request headers/params once available in generated contract or context
         val questions = domainService.getQuestions(
             page = params.page,
             pageSize = 10,
-            locale = "en"
+            locale = params.locale ?: "en"
         )
         return DTOResponse(true, QuestionListResponseDTO(questions = questions), null)
     }
 
     override suspend fun GetQuestionsId(body: EmptyRequestDTO, params: GetQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO> {
-        val question = domainService.getQuestionById(params.id, "en")
+        val question = domainService.getQuestionById(params.id, params.locale ?: "en")
 
         return if (question != null) {
             DTOResponse(true, QuestionDataResponseDTO(question = question), null)
@@ -28,7 +27,7 @@ class QuestionsContractImpl : QuestionsService {
     }
 
     override suspend fun GetBatch(body: EmptyRequestDTO, params: GetQuestionsBatchParamsDTO): DTOResponse<QuestionListResponseDTO> {
-        val questions = domainService.getQuestionsBatch(params.ids, "en")
+        val questions = domainService.getQuestionsBatch(params.ids, params.locale ?: "en")
         return DTOResponse(true, QuestionListResponseDTO(questions = questions), null)
     }
 
@@ -43,6 +42,9 @@ class QuestionsContractImpl : QuestionsService {
     }
 
     override suspend fun PutQuestionsId(body: UpdateQuestionRequestDTO, params: UpdateQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO> {
+        // UpdateQuestionParamsDTO does not support locale yet, usually updates are content-agnostic or send full object.
+        // Assuming update returns the object in 'en' or we should add locale to UpdateParams too?
+        // The comment only mentioned retrieval DTOs.
         val success = domainService.updateQuestion(params.id, body)
         if (success) {
              val updatedQ = domainService.getQuestionById(params.id, "en")

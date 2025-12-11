@@ -49,17 +49,20 @@ class EmptyParamsDTO : DTOParams()
 
 @Serializable
 data class SearchQuestionsParamsDTO(
-    val page: Int
+    val page: Int,
+    val locale: String? = null
 ) : DTOParams()
 
 @Serializable
 data class GetQuestionParamsDTO(
-    val id: Int
+    val id: Int,
+    val locale: String? = null
 ) : DTOParams()
 
 @Serializable
 data class GetQuestionsBatchParamsDTO(
-    val ids: List<Int>
+    val ids: List<Int>,
+    val locale: String? = null
 ) : DTOParams()
 
 @Serializable
