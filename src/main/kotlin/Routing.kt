@@ -13,6 +13,7 @@ import com.quizbackend.features.users.ProfileContractImpl
 import com.quizbackend.features.users.UsersService
 import com.quizbackend.routing.RouteDefinition
 import com.quizbackend.services.notification.MockEmailSender
+import com.quizbackend.utils.CallContext
 import com.quizbackend.utils.UserContext
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -77,7 +78,9 @@ fun <Body : Any, Params : DTOParams, Response : Any> Route.configureRoute(
                 val params: Params = parseParams(call, def.paramsType)
 
                 // Execute
-                val response = def.handler(body, params)
+                val response = kotlinx.coroutines.withContext(CallContext(call)) {
+                    def.handler(body, params)
+                }
 
                 // Respond
                 if (response.success) {

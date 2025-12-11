@@ -561,7 +561,8 @@
       "properties": [
         { "name": "name", "type": "String", "isNullable": false },
         { "name": "description", "type": "String", "isNullable": false },
-        { "name": "isPublic", "type": "Boolean", "isNullable": false }
+        { "name": "isPublic", "type": "Boolean", "isNullable": false },
+        { "name": "questionIds", "type": "List<Int>", "isNullable": false }
       ]
     },
     "IdDataDTO": {
@@ -575,7 +576,8 @@
       "properties": [
         { "name": "name", "type": "String", "isNullable": false },
         { "name": "description", "type": "String", "isNullable": false },
-        { "name": "isPublic", "type": "Boolean", "isNullable": false }
+        { "name": "isPublic", "type": "Boolean", "isNullable": false },
+        { "name": "questionIds", "type": "List<Int>", "isNullable": false }
       ]
     },
     "MarkDataDTO": {
