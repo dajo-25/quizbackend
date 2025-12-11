@@ -24,8 +24,9 @@ class EmptyParamsDTO extends DTOParams {
 @JsonSerializable()
 class SearchQuestionsParamsDTO extends DTOParams {
   final int page;
+  final String? locale;
 
-  SearchQuestionsParamsDTO({required this.page, });
+  SearchQuestionsParamsDTO({required this.page, this.locale, });
 
   factory SearchQuestionsParamsDTO.fromJson(Map<String, dynamic> json) => _$SearchQuestionsParamsDTOFromJson(json);
   Map<String, dynamic> toJson() => _$SearchQuestionsParamsDTOToJson(this);
@@ -34,8 +35,9 @@ class SearchQuestionsParamsDTO extends DTOParams {
 @JsonSerializable()
 class GetQuestionParamsDTO extends DTOParams {
   final int id;
+  final String? locale;
 
-  GetQuestionParamsDTO({required this.id, });
+  GetQuestionParamsDTO({required this.id, this.locale, });
 
   factory GetQuestionParamsDTO.fromJson(Map<String, dynamic> json) => _$GetQuestionParamsDTOFromJson(json);
   Map<String, dynamic> toJson() => _$GetQuestionParamsDTOToJson(this);
@@ -44,8 +46,9 @@ class GetQuestionParamsDTO extends DTOParams {
 @JsonSerializable()
 class GetQuestionsBatchParamsDTO extends DTOParams {
   final List<int> ids;
+  final String? locale;
 
-  GetQuestionsBatchParamsDTO({required this.ids, });
+  GetQuestionsBatchParamsDTO({required this.ids, this.locale, });
 
   factory GetQuestionsBatchParamsDTO.fromJson(Map<String, dynamic> json) => _$GetQuestionsBatchParamsDTOFromJson(json);
   Map<String, dynamic> toJson() => _$GetQuestionsBatchParamsDTOToJson(this);

@@ -242,19 +242,22 @@
     "SearchQuestionsParamsDTO": {
       "inherits": "DTOParams",
       "properties": [
-        { "name": "page", "type": "Int", "isNullable": false }
+        { "name": "page", "type": "Int", "isNullable": false },
+        { "name": "locale", "type": "String", "isNullable": true }
       ]
     },
     "GetQuestionParamsDTO": {
       "inherits": "DTOParams",
       "properties": [
-        { "name": "id", "type": "Int", "isNullable": false }
+        { "name": "id", "type": "Int", "isNullable": false },
+        { "name": "locale", "type": "String", "isNullable": true }
       ]
     },
     "GetQuestionsBatchParamsDTO": {
       "inherits": "DTOParams",
       "properties": [
-        { "name": "ids", "type": "List<Int>", "isNullable": false }
+        { "name": "ids", "type": "List<Int>", "isNullable": false },
+        { "name": "locale", "type": "String", "isNullable": true }
       ]
     },
     "UpdateQuestionParamsDTO": {

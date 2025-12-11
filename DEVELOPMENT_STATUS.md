@@ -11,10 +11,9 @@
 
 ## Quiz Feature
 ### Questions
-* **Schema:** 30% Ready. Table exists but uses primitive CSV text fields for answers instead of proper relational tables or JSON structures. `Answers` and `Localizations` tables are missing or not integrated.
-* **Read:** 20% Ready. Fetches rows from DB but returns hardcoded "Question Text" and ignores answers/localizations.
-    *   *Missing:* Proper mapping of DB data to DTOs, handling of answer lists, localization support.
-* **Write (Create/Update/Delete):** 0% Ready. Completely mocked.
+* **Schema:** 100% Ready. Normalized with `Questions`, `Answers`, and `Localizations` tables.
+* **Read:** 100% Ready. Implemented efficient fetching with locale fallback and N+1 prevention.
+* **Write (Create/Update/Delete):** 100% Ready. Implemented transactional creation, updates, and deletion. Verified via integration tests.
 
 ### Collections
 * **Schema:** 100% Ready. Tables (`Collections`, `CollectionQuestions`, `CollectionAccess`) exist and are used.
@@ -32,7 +31,7 @@
     *   *Missing:* Connection between API and Domain Service.
 
 ## Infrastructure & General
-* **Database:** SQLite is set up with basic tables for Users, Devices, Questions, Collections.
-    *   *Missing:* Tables for Marks, Friends, Answers (relational), Localizations.
+* **Database:** SQLite is set up with basic tables for Users, Devices, Questions, Collections, Answers, Localizations.
+    *   *Missing:* Tables for Marks, Friends.
 * **Email:** `JavaxEmailSender` implementation exists.
 * **API Contract:** Defined and generates code. `UserContext` mechanism added to support authenticated routes.

@@ -1,53 +1,69 @@
 package com.quizbackend.features.quiz.questions
 
 import com.quizbackend.contracts.generated.*
-import com.quizbackend.features.quiz.questions.models.Questions
-import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import io.ktor.server.application.*
 
 class QuestionsContractImpl : QuestionsService {
 
+    private val domainService = QuestionsDomainService()
+
     override suspend fun GetQuestions(body: EmptyRequestDTO, params: SearchQuestionsParamsDTO): DTOResponse<QuestionListResponseDTO> {
-        return transaction {
-            val questionsList = Questions.selectAll().where { Questions.isDiscoverable eq true }
-                .limit(10, offset = ((params.page - 1) * 10).toLong())
-                .map {
-                    QuestionDataDTO(it[Questions.id].value, "Question ${it[Questions.id].value}", emptyList())
-                }
-            DTOResponse(true, QuestionListResponseDTO(questions = questionsList), null)
-        }
+        val questions = domainService.getQuestions(
+            page = params.page,
+            pageSize = 10,
+            locale = params.locale ?: "en"
+        )
+        return DTOResponse(true, QuestionListResponseDTO(questions = questions), null)
     }
 
     override suspend fun GetQuestionsId(body: EmptyRequestDTO, params: GetQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO> {
-        return transaction {
-            val q = Questions.selectAll().where { Questions.id eq params.id }.singleOrNull()
-            if (q != null) {
-                DTOResponse(true, QuestionDataResponseDTO(question = QuestionDataDTO(q[Questions.id].value, "Question Text", emptyList())), null)
-            } else {
-                DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.QUESTION_NOT_FOUND, "Question not found"))
-            }
+        val question = domainService.getQuestionById(params.id, params.locale ?: "en")
+
+        return if (question != null) {
+            DTOResponse(true, QuestionDataResponseDTO(question = question), null)
+        } else {
+            DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.QUESTION_NOT_FOUND, "Question not found"))
         }
     }
 
     override suspend fun GetBatch(body: EmptyRequestDTO, params: GetQuestionsBatchParamsDTO): DTOResponse<QuestionListResponseDTO> {
-        val ids = params.ids
-        return transaction {
-            val questionsList = Questions.selectAll().where { Questions.id inList ids }
-                .map { QuestionDataDTO(it[Questions.id].value, "Question ${it[Questions.id].value}", emptyList()) }
-            DTOResponse(true, QuestionListResponseDTO(questions = questionsList), null)
-        }
+        val questions = domainService.getQuestionsBatch(params.ids, params.locale ?: "en")
+        return DTOResponse(true, QuestionListResponseDTO(questions = questions), null)
     }
 
     override suspend fun PostQuestions(body: CreateQuestionsRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
-        return DTOResponse(true, GenericResponseDTO(true), null)
+        // TODO: Get userId from context
+        val success = domainService.createQuestions(null, body.questions)
+        return if (success) {
+            DTOResponse(true, GenericResponseDTO(true), null)
+        } else {
+            DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, "Failed to create questions"))
+        }
     }
 
     override suspend fun PutQuestionsId(body: UpdateQuestionRequestDTO, params: UpdateQuestionParamsDTO): DTOResponse<QuestionDataResponseDTO> {
-        return DTOResponse(true, QuestionDataResponseDTO(question = QuestionDataDTO(params.id, "Updated Question", emptyList())), null)
+        // UpdateQuestionParamsDTO does not support locale yet, usually updates are content-agnostic or send full object.
+        // Assuming update returns the object in 'en' or we should add locale to UpdateParams too?
+        // The comment only mentioned retrieval DTOs.
+        val success = domainService.updateQuestion(params.id, body)
+        if (success) {
+             val updatedQ = domainService.getQuestionById(params.id, "en")
+             return if (updatedQ != null) {
+                 DTOResponse(true, QuestionDataResponseDTO(question = updatedQ), null)
+             } else {
+                 DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.INTERNAL_SERVER_ERROR, "Failed to retrieve updated question"))
+             }
+        } else {
+             return DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.QUESTION_NOT_FOUND, "Question not found or update failed"))
+        }
     }
 
     override suspend fun DeleteQuestionsId(body: EmptyRequestDTO, params: DeleteQuestionParamsDTO): DTOResponse<GenericResponseDTO> {
-        return DTOResponse(true, GenericResponseDTO(true), null)
+        val success = domainService.deleteQuestion(params.id)
+        return if (success) {
+            DTOResponse(true, GenericResponseDTO(true), null)
+        } else {
+            DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.QUESTION_NOT_FOUND, "Question not found"))
+        }
     }
 }
