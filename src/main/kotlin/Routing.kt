@@ -3,7 +3,7 @@ package com.quizbackend
 import com.quizbackend.contracts.generated.*
 import com.quizbackend.features.auth.AuthContractImpl
 import com.quizbackend.features.auth.AuthDomainService
-import com.quizbackend.features.communities.CommunitiesMockContractImpl
+import com.quizbackend.features.communities.CommunitiesContractImpl
 import com.quizbackend.features.devices.DevicesService
 import com.quizbackend.features.devices.NotificationsContractImpl
 import com.quizbackend.features.marks.MarksMockContractImpl
@@ -39,7 +39,7 @@ fun Application.configureRouting() {
     val authService = AuthContractImpl(authDomainService)
     val questionsService = QuestionsContractImpl()
     val collectionsService = CollectionsContractImpl()
-    val communitiesService = CommunitiesMockContractImpl()
+    val communitiesService = CommunitiesContractImpl()
     val marksService = MarksMockContractImpl()
     val devicesContractService = NotificationsContractImpl() // Renamed to avoid confusion with domain service and match Generated interface arg name
     val profileService = ProfileContractImpl()

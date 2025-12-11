@@ -362,7 +362,20 @@ data class FriendRequestDataDTO(
     val senderId: Int,
     val receiverId: Int,
     val status: String,
-    val createdAt: String
+    val createdAt: String,
+    val sender: PublicUserProfileDTO,
+    val receiver: PublicUserProfileDTO
+)
+
+@Serializable
+data class RespondFriendRequestRequestDTO(
+    val requestId: Int,
+    val accept: Boolean
+)
+
+@Serializable
+data class FriendRequestListResponseDTO(
+    val requests: List<FriendRequestDataDTO>
 )
 
 @Serializable

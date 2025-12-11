@@ -11,9 +11,14 @@ class CommunitiesService {
     return DTOResponse<FriendRequestResponseDTO>.fromJson(response.data, (json) => FriendRequestResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<GenericResponseDTO>> postRespond({}) async {
-    final response = await _dio.post('/communities/friend-request/respond');
+  Future<DTOResponse<GenericResponseDTO>> postRespond({required RespondFriendRequestRequestDTO body}) async {
+    final response = await _dio.post('/communities/friend-request/respond', data: body.toJson());
     return DTOResponse<GenericResponseDTO>.fromJson(response.data, (json) => GenericResponseDTO.fromJson(json as Map<String, dynamic>));
+  }
+
+  Future<DTOResponse<FriendRequestListResponseDTO>> getFriendRequests({}) async {
+    final response = await _dio.get('/communities/friend-requests');
+    return DTOResponse<FriendRequestListResponseDTO>.fromJson(response.data, (json) => FriendRequestListResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
   Future<DTOResponse<UserListResponseDTO>> getUsers({}) async {

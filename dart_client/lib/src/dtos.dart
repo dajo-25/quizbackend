@@ -588,11 +588,34 @@ class FriendRequestDataDTO {
   final int receiverId;
   final String status;
   final String createdAt;
+  final PublicUserProfileDTO sender;
+  final PublicUserProfileDTO receiver;
 
-  FriendRequestDataDTO({required this.id, required this.senderId, required this.receiverId, required this.status, required this.createdAt, });
+  FriendRequestDataDTO({required this.id, required this.senderId, required this.receiverId, required this.status, required this.createdAt, required this.sender, required this.receiver, });
 
   factory FriendRequestDataDTO.fromJson(Map<String, dynamic> json) => _$FriendRequestDataDTOFromJson(json);
   Map<String, dynamic> toJson() => _$FriendRequestDataDTOToJson(this);
+}
+
+@JsonSerializable()
+class RespondFriendRequestRequestDTO {
+  final int requestId;
+  final bool accept;
+
+  RespondFriendRequestRequestDTO({required this.requestId, required this.accept, });
+
+  factory RespondFriendRequestRequestDTO.fromJson(Map<String, dynamic> json) => _$RespondFriendRequestRequestDTOFromJson(json);
+  Map<String, dynamic> toJson() => _$RespondFriendRequestRequestDTOToJson(this);
+}
+
+@JsonSerializable()
+class FriendRequestListResponseDTO {
+  final List<FriendRequestDataDTO> requests;
+
+  FriendRequestListResponseDTO({required this.requests, });
+
+  factory FriendRequestListResponseDTO.fromJson(Map<String, dynamic> json) => _$FriendRequestListResponseDTOFromJson(json);
+  Map<String, dynamic> toJson() => _$FriendRequestListResponseDTOToJson(this);
 }
 
 @JsonSerializable()

@@ -176,9 +176,17 @@
     {
       "method": "POST",
       "path": "/communities/friend-request/respond",
-      "bodyType": "EmptyRequestDTO",
+      "bodyType": "RespondFriendRequestRequestDTO",
       "paramsType": "EmptyParamsDTO",
       "responseType": "GenericResponseDTO",
+      "requiresAuth": true
+    },
+    {
+      "method": "GET",
+      "path": "/communities/friend-requests",
+      "bodyType": "EmptyRequestDTO",
+      "paramsType": "EmptyParamsDTO",
+      "responseType": "FriendRequestListResponseDTO",
       "requiresAuth": true
     },
     {
@@ -605,7 +613,22 @@
         { "name": "senderId", "type": "Int", "isNullable": false },
         { "name": "receiverId", "type": "Int", "isNullable": false },
         { "name": "status", "type": "String", "isNullable": false },
-        { "name": "createdAt", "type": "String", "isNullable": false }
+        { "name": "createdAt", "type": "String", "isNullable": false },
+        { "name": "sender", "type": "PublicUserProfileDTO", "isNullable": false },
+        { "name": "receiver", "type": "PublicUserProfileDTO", "isNullable": false }
+      ]
+    },
+    "RespondFriendRequestRequestDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "requestId", "type": "Int", "isNullable": false },
+        { "name": "accept", "type": "Boolean", "isNullable": false }
+      ]
+    },
+    "FriendRequestListResponseDTO": {
+      "inherits": null,
+      "properties": [
+        { "name": "requests", "type": "List<FriendRequestDataDTO>", "isNullable": false }
       ]
     },
     "PublicUserProfileDTO": {
