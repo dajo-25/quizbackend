@@ -10,9 +10,12 @@ It is currently a placeholder in the API contract.
 *   **Importance:** Essential for the social virality of the app. Users want to compete with friends.
 
 ## Mechanisms & Components Needed
-1.  **Schema Creation:**
+1.  **Contract Updates:**
+    *   New DTOs: `FriendRequestDTO`, `UserSearchResponseDTO`.
+    *   New Endpoints: `POST /community/friends/request`, `POST /community/friends/accept`, `GET /community/users/search`.
+2.  **Schema Creation:**
     *   `FriendRequests` table (id, sender_id, receiver_id, status [PENDING, ACCEPTED, REJECTED], created_at).
-2.  **Logic Implementation:**
+3.  **Logic Implementation:**
     *   `CommunitiesDomainService` to handle the state machine of a friend request.
     *   Search function in `UsersService` to find users by username/email (partial match).
 
@@ -21,10 +24,11 @@ It is currently a placeholder in the API contract.
 *   **Notifications:** Sending a friend request should trigger a Push Notification to the receiver.
 
 ## Step-by-Step Decomposition
-1.  **Define Schema:** Create `FriendRequests` table in `Users` module or `Communities` module.
-2.  **Implement Search:** Add `search(query: String)` to `UsersService`.
-3.  **Implement Request Logic:** Create `sendRequest`, `acceptRequest`, `rejectRequest`.
-4.  **Wire API:** Connect `CommunitiesContractImpl` to these services.
+1.  **Update Contract:** Define the new DTOs and Endpoints in `api_contract.json` and regenerate code.
+2.  **Define Schema:** Create `FriendRequests` table in `Users` module or `Communities` module.
+3.  **Implement Search:** Add `search(query: String)` to `UsersService`.
+4.  **Implement Request Logic:** Create `sendRequest`, `acceptRequest`, `rejectRequest`.
+5.  **Wire API:** Connect `CommunitiesContractImpl` to these services.
 
 ## Product-Approached Review
 *   **Relevance:** Social features drive retention.

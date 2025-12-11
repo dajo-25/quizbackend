@@ -14,23 +14,22 @@ While the "happy path" for entering the app (Login/Signup) works, the lifecycle 
 *   **Importance:** Security and user trust depend on the ability to securely leave the session, change compromised credentials, and delete data. The lack of strict email validation allows garbage data into the system.
 
 ## Mechanisms & Components Needed
-1.  **Context Injection in Contracts:** The primary blocker is the generated code for authenticated routes. It does not pass the `userId` or `ApplicationCall` to the `AuthContractImpl`.
-    *   *Solution:* Modify the contract generator or `api_contract.json` to support a "Security Context" argument in generated interfaces.
-2.  **Wiring Domain Logic:** Once context is available, `AuthContractImpl` methods (`PostLogout`, `DeleteAccount`, `PostChangePassword`) must call the existing `AuthDomainService` methods.
+1.  **User Context Retrieval:** The `AuthContractImpl` currently lacks access to the user making the request.
+    *   *Solution:* Since the contract signature cannot be changed, logic must be implemented to retrieve the `userId` from the Bearer Token present in the request context (e.g., via `coroutineContext`, `ThreadLocal`, or by inspecting the `Authentication` plugin integration in `Routing.kt`).
+2.  **Wiring Domain Logic:** Once the user context is accessible, `AuthContractImpl` methods (`PostLogout`, `DeleteAccount`, `PostChangePassword`) must call the existing `AuthDomainService` methods.
 3.  **Strict Validation:** Integrate a validation library (e.g., Apache Commons Validator or a Regex) in `AuthDomainService.signup` to reject malformed emails.
 4.  **Transaction Management:** Ensure account deletion cascades correctly (removing or anonymizing User, Devices, CollectionAccess).
 
 ## Additional Considerations
-*   **Token Security:** The current "Handmade Token" (SHA-512 of random data) is opaque. Consider switching to JWT (Json Web Tokens) for statelessness and standard expiration handling, or ensure the database lookup for these tokens is highly optimized (cached).
+*   **Token Security:** The current "Handmade Token" (SHA-512 of random data) is opaque. Continue using the Bearer token system, but ensure secure and efficient lookup.
 *   **Rate Limiting:** Login and Signup endpoints are vulnerable to brute-force attacks. Implement rate limiting (e.g., via Redis or Ktor features).
 
 ## Step-by-Step Decomposition
-1.  **Fix Contract Generation:** Analyze `generateContract` task to enable `userId` parameter injection in service interfaces.
-2.  **Regenerate Code:** Run the build task to update `AuthService` interface.
-3.  **Implement Logout:** Update `AuthContractImpl.PostLogout` to call `authDomainService.logout(token)`.
-4.  **Implement Change Password:** Update `AuthContractImpl` to extract `userId`, verify `oldHash`, and save `newHash`.
-5.  **Implement Delete Account:** Create `UsersService.delete(userId)` (soft or hard delete) and wire it to the contract.
-6.  **Add Validation:** Refactor `signup` to throw/return error if email format is invalid.
+1.  **Implement Context Access:** Investigate and implement a mechanism to access the current `userId` (from the Bearer token) within the service implementations without modifying the generated interface signatures.
+2.  **Implement Logout:** Update `AuthContractImpl.PostLogout` to call `authDomainService.logout(token)`.
+3.  **Implement Change Password:** Update `AuthContractImpl` to extract `userId`, verify `oldHash`, and save `newHash`.
+4.  **Implement Delete Account:** Create `UsersService.delete(userId)` (soft or hard delete) and wire it to the contract.
+5.  **Add Validation:** Refactor `signup` to throw/return error if email format is invalid.
 
 ## Product-Approached Review
 *   **Relevance:** Authentication is the gatekeeper of the application. It is the first interaction a user has.
