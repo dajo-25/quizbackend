@@ -16,13 +16,13 @@ class AuthService {
     return DTOResponse<LoginResponseDTO>.fromJson(response.data, (json) => LoginResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<GenericResponseDTO>> postLogout({}) async {
-    final response = await _dio.post('/auth/logout');
+  Future<DTOResponse<GenericResponseDTO>> postLogout({String? bearerToken}) async {
+    final response = await _dio.post('/auth/logout', options: bearerToken != null ? Options(headers: {'Authorization': 'Bearer $bearerToken'}) : null);
     return DTOResponse<GenericResponseDTO>.fromJson(response.data, (json) => GenericResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<MessageResponseDTO>> deleteAccount({}) async {
-    final response = await _dio.delete('/auth/account');
+  Future<DTOResponse<MessageResponseDTO>> deleteAccount({String? bearerToken}) async {
+    final response = await _dio.delete('/auth/account', options: bearerToken != null ? Options(headers: {'Authorization': 'Bearer $bearerToken'}) : null);
     return DTOResponse<MessageResponseDTO>.fromJson(response.data, (json) => MessageResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
@@ -36,18 +36,18 @@ class AuthService {
     return DTOResponse<GenericResponseDTO>.fromJson(response.data, (json) => GenericResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<MustChangePasswordResponseDTO>> getMustChangePassword({}) async {
-    final response = await _dio.get('/auth/must-change-password');
+  Future<DTOResponse<MustChangePasswordResponseDTO>> getMustChangePassword({String? bearerToken}) async {
+    final response = await _dio.get('/auth/must-change-password', options: bearerToken != null ? Options(headers: {'Authorization': 'Bearer $bearerToken'}) : null);
     return DTOResponse<MustChangePasswordResponseDTO>.fromJson(response.data, (json) => MustChangePasswordResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<GenericResponseDTO>> postChangePassword({required ChangePasswordRequestDTO body}) async {
-    final response = await _dio.post('/auth/change-password', data: body.toJson());
+  Future<DTOResponse<GenericResponseDTO>> postChangePassword({required ChangePasswordRequestDTO body, String? bearerToken}) async {
+    final response = await _dio.post('/auth/change-password', data: body.toJson(), options: bearerToken != null ? Options(headers: {'Authorization': 'Bearer $bearerToken'}) : null);
     return DTOResponse<GenericResponseDTO>.fromJson(response.data, (json) => GenericResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<UserStatusResponseDTO>> getStatus({}) async {
-    final response = await _dio.get('/auth/status');
+  Future<DTOResponse<UserStatusResponseDTO>> getStatus({String? bearerToken}) async {
+    final response = await _dio.get('/auth/status', options: bearerToken != null ? Options(headers: {'Authorization': 'Bearer $bearerToken'}) : null);
     return DTOResponse<UserStatusResponseDTO>.fromJson(response.data, (json) => UserStatusResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 

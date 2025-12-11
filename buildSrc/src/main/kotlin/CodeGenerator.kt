@@ -409,52 +409,23 @@ open class GenerateContractTask : DefaultTask() {
 
     private fun generateDartClient(projectDir: File, json: JsonObject) {
         val dartRoot = File(projectDir, "dart_client")
-        dartRoot.mkdirs()
 
-        generateDartPubspec(dartRoot, json)
+        val contractsDir = File(dartRoot, "contracts")
+        contractsDir.mkdirs()
 
-        val libDir = File(dartRoot, "lib")
-        libDir.mkdirs()
-
-        val srcDir = File(libDir, "src")
-        srcDir.mkdirs()
-        val servicesDir = File(srcDir, "services")
+        val servicesDir = File(contractsDir, "services")
         servicesDir.mkdirs()
 
         val enums = json["enums"]?.jsonObject ?: emptyMap()
-        generateDartEnums(srcDir, enums)
+        generateDartEnums(contractsDir, enums)
 
         val dtos = json["dtos"]?.jsonObject ?: emptyMap()
-        generateDartDTOs(srcDir, dtos)
+        generateDartDTOs(contractsDir, dtos)
 
         val routes = json["routes"]?.jsonArray ?: emptyList()
         generateDartServices(servicesDir, routes, dtos)
 
-        generateDartClientEntryPoint(libDir, routes)
-    }
-
-    private fun generateDartPubspec(dartRoot: File, json: JsonObject) {
-        val name = "quiz_api_client"
-        val description = json["description"]?.jsonPrimitive?.content ?: "A Dart API client"
-        val version = json["version"]?.jsonPrimitive?.content ?: "1.0.0"
-
-        val content = """
-name: $name
-description: $description
-version: $version
-environment:
-  sdk: '>=2.17.0 <4.0.0'
-
-dependencies:
-  dio: ^5.0.0
-  json_annotation: ^4.8.0
-
-dev_dependencies:
-  build_runner: ^2.3.3
-  json_serializable: ^6.6.0
-  lints: ^2.0.0
-""".trimIndent()
-        File(dartRoot, "pubspec.yaml").writeText(content)
+        generateDartClientEntryPoint(contractsDir, routes)
     }
 
     private fun generateDartEnums(outputDir: File, enums: Map<String, JsonElement>) {
@@ -578,6 +549,7 @@ dev_dependencies:
                 val bodyType = r["bodyType"]!!.jsonPrimitive.content
                 val paramsType = r["paramsType"]!!.jsonPrimitive.content
                 val responseType = r["responseType"]!!.jsonPrimitive.content
+                val requiresAuth = r["requiresAuth"]?.jsonPrimitive?.boolean ?: false
 
                 // Function Name
                 val segments = path.trim('/').split('/')
@@ -636,7 +608,16 @@ dev_dependencies:
                     }
                 }
 
-                sb.append("  Future<DTOResponse<$responseType>> $methodName({${args.joinToString(", ")}}) async {\n")
+                // Bearer Auth
+                if (requiresAuth) {
+                    args.add("String? bearerToken")
+                }
+
+                sb.append("  Future<DTOResponse<$responseType>> $methodName(")
+                if (args.isNotEmpty()) {
+                    sb.append("{${args.joinToString(", ")}}")
+                }
+                sb.append(") async {\n")
 
                 // Construct path
                 var dartPath = "'$path'"
@@ -661,6 +642,10 @@ dev_dependencies:
                     sb.append("}")
                 }
 
+                if (requiresAuth) {
+                    sb.append(", options: bearerToken != null ? Options(headers: {'Authorization': 'Bearer \$bearerToken'}) : null")
+                }
+
                 sb.append(");\n")
                 sb.append("    return DTOResponse<$responseType>.fromJson(response.data, (json) => $responseType.fromJson(json as Map<String, dynamic>));\n")
                 sb.append("  }\n\n")
@@ -670,7 +655,7 @@ dev_dependencies:
         }
     }
 
-    private fun generateDartClientEntryPoint(libDir: File, routes: List<JsonElement>) {
+    private fun generateDartClientEntryPoint(outputDir: File, routes: List<JsonElement>) {
         val serviceNames = routes.map {
             val path = it.jsonObject["path"]!!.jsonPrimitive.content
             val segments = path.trim('/').split('/')
@@ -680,12 +665,12 @@ dev_dependencies:
         val sb = StringBuilder()
         sb.append("import 'package:dio/dio.dart';\n")
         serviceNames.forEach {
-             sb.append("import 'src/services/${it}_service.dart';\n")
+             sb.append("import 'services/${it}_service.dart';\n")
         }
-        sb.append("export 'src/dtos.dart';\n")
-        sb.append("export 'src/enums.dart';\n")
+        sb.append("export 'dtos.dart';\n")
+        sb.append("export 'enums.dart';\n")
         serviceNames.forEach {
-             sb.append("export 'src/services/${it}_service.dart';\n")
+             sb.append("export 'services/${it}_service.dart';\n")
         }
         sb.append("\n")
 
@@ -710,6 +695,6 @@ dev_dependencies:
         sb.append("  }\n")
         sb.append("}\n")
 
-        File(libDir, "api_client.dart").writeText(sb.toString())
+        File(outputDir, "api_client.dart").writeText(sb.toString())
     }
 }

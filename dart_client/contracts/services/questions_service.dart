@@ -11,8 +11,8 @@ class QuestionsService {
     return DTOResponse<QuestionListResponseDTO>.fromJson(response.data, (json) => QuestionListResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<GenericResponseDTO>> postQuestions({required CreateQuestionsRequestDTO body}) async {
-    final response = await _dio.post('/questions', data: body.toJson());
+  Future<DTOResponse<GenericResponseDTO>> postQuestions({required CreateQuestionsRequestDTO body, String? bearerToken}) async {
+    final response = await _dio.post('/questions', data: body.toJson(), options: bearerToken != null ? Options(headers: {'Authorization': 'Bearer $bearerToken'}) : null);
     return DTOResponse<GenericResponseDTO>.fromJson(response.data, (json) => GenericResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
@@ -21,13 +21,13 @@ class QuestionsService {
     return DTOResponse<QuestionDataResponseDTO>.fromJson(response.data, (json) => QuestionDataResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<QuestionDataResponseDTO>> putQuestionsId({required UpdateQuestionRequestDTO body, required int id}) async {
-    final response = await _dio.put('/questions/$id', data: body.toJson());
+  Future<DTOResponse<QuestionDataResponseDTO>> putQuestionsId({required UpdateQuestionRequestDTO body, required int id, String? bearerToken}) async {
+    final response = await _dio.put('/questions/$id', data: body.toJson(), options: bearerToken != null ? Options(headers: {'Authorization': 'Bearer $bearerToken'}) : null);
     return DTOResponse<QuestionDataResponseDTO>.fromJson(response.data, (json) => QuestionDataResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
-  Future<DTOResponse<GenericResponseDTO>> deleteQuestionsId({required int id}) async {
-    final response = await _dio.delete('/questions/$id');
+  Future<DTOResponse<GenericResponseDTO>> deleteQuestionsId({required int id, String? bearerToken}) async {
+    final response = await _dio.delete('/questions/$id', options: bearerToken != null ? Options(headers: {'Authorization': 'Bearer $bearerToken'}) : null);
     return DTOResponse<GenericResponseDTO>.fromJson(response.data, (json) => GenericResponseDTO.fromJson(json as Map<String, dynamic>));
   }
 
