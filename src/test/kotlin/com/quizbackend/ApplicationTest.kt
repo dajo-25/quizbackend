@@ -28,8 +28,8 @@ class ApplicationTest {
         val signupResponse = client.post("/auth/signup") {
             contentType(ContentType.Application.Json)
             setBody(SignupRequestDTO(
-                email = "test@example.com",
-                username = "testuser",
+                email = "unique_test_user_${System.currentTimeMillis()}@example.com",
+                username = "testuser_${System.currentTimeMillis()}",
                 name = "Test",
                 surname = "User",
                 passwordHash = "hash123"
@@ -39,8 +39,10 @@ class ApplicationTest {
         val signupText = signupResponse.bodyAsText()
         println("Signup Body: $signupText")
         assertEquals(HttpStatusCode.OK, signupResponse.status)
-        val signupBody = Json.decodeFromString<DTOResponse<GenericResponseDTO>>(signupText)
+        // Signup now returns LoginResponseDTO, not GenericResponseDTO
+        val signupBody = Json.decodeFromString<DTOResponse<LoginResponseDTO>>(signupText)
         assertTrue(signupBody.success, "Signup failed: ${signupBody.error}")
+        assertNotNull(signupBody.data?.token, "Signup should return a token")
 
         // Test Login
         val loginResponse = client.post("/auth/login") {

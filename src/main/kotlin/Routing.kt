@@ -13,6 +13,7 @@ import com.quizbackend.features.users.ProfileContractImpl
 import com.quizbackend.features.users.UsersService
 import com.quizbackend.routing.RouteDefinition
 import com.quizbackend.services.notification.MockEmailSender
+import com.quizbackend.utils.UserContext
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -112,6 +113,23 @@ fun <Body : Any, Params : DTOParams, Response : Any> Route.configureRoute(
     if (def.requiresAuth) {
         authenticate("auth-bearer") {
             route(def.path, def.method) {
+                // Wrap handler to set UserContext and ensure cleanup
+                intercept(ApplicationCallPipeline.Call) {
+                    try {
+                        val principal = call.principal<UserIdPrincipal>()
+                        if (principal != null) {
+                            UserContext.setUserId(principal.name.toInt())
+                            val token = call.request.parseAuthorizationHeader()?.render()?.removePrefix("Bearer ")
+                            if (token != null) {
+                                UserContext.setToken(token)
+                            }
+                        }
+                        proceed()
+                    } finally {
+                        UserContext.clear()
+                    }
+                }
+
                 routeBlock()
             }
         }

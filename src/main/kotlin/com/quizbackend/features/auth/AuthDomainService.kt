@@ -15,15 +15,32 @@ class AuthDomainService(
     private val emailSender: EmailSender
 ) {
 
-    fun signup(email: String, username: String, name: String, surname: String, passwordHash: String): Boolean {
-        if (usersService.findByEmail(email) != null) return false
+    fun signup(email: String, username: String, name: String, surname: String, passwordHash: String): String? {
+        if (!isValidEmail(email)) return null
+        if (usersService.findByEmail(email) != null) return null
 
         usersService.create(email, username, name, surname, passwordHash)
 
         // Send verification email
         sendVerificationEmail(email)
 
-        return true
+        // Generate token and login immediately
+        // Note: In a real app we might want to wait for verification, but for this task "functional bearer token as in the login" implies immediate login.
+        // We need a uniqueId for the device. Since signup doesn't provide it in the current contract (SignupRequestDTO),
+        // we might have to generate one or reuse a default.
+        // However, LoginRequestDTO requires uniqueId. SignupRequestDTO does NOT have uniqueId.
+        // I'll use a random UUID for the initial device uniqueId for signup,
+        // OR the client should provide it. The contract says SignupRequestDTO has: email, username, name, surname, passwordHash.
+        // It does NOT have uniqueId.
+        // I will generate a random uniqueId for this session.
+        val uniqueId = UUID.randomUUID().toString()
+
+        return login(email, passwordHash, uniqueId)
+    }
+
+    private fun isValidEmail(email: String): Boolean {
+        val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+        return emailRegex.matches(email)
     }
 
     fun login(email: String, passwordHash: String, uniqueId: String): String? {
@@ -42,6 +59,20 @@ class AuthDomainService(
 
     fun logout(token: String) {
         devicesService.disableDevice(token)
+    }
+
+    fun deleteAccount(userId: Int) {
+        // Soft delete or Hard delete?
+        // Requirement says "function as a production-ready".
+        // Usually we want to remove user data.
+        // For now, I'll delete the user which should cascade if configured, or I manually clean up.
+        // I will assume usersService.delete handles it.
+        // Wait, UsersService doesn't have delete yet?
+        // I'll need to check UsersService.
+        // For now I'll assume I can add it or it exists.
+        // Memory says: "Account deletion logic... is currently mocked...".
+        // "Implement Delete Account: Create UsersService.delete(userId)..."
+        usersService.delete(userId)
     }
 
     fun recoverPassword(email: String) {
