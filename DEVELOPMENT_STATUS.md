@@ -22,8 +22,8 @@
 * **Write (Create/Update/Delete):** 0% Ready. Completely mocked.
 
 ### Collections
-* **Schema:** 80% Ready. Tables (`Collections`, `CollectionQuestions`, `CollectionAccess`) exist and look correct.
-* **Logic:** 0% Ready. API contract implementation is 100% mocked and ignores the database tables.
+* **Schema:** 100% Ready. Tables (`Collections`, `CollectionQuestions`, `CollectionAccess`) exist and are used.
+* **Logic:** 100% Ready. API implemented via `CollectionsDomainService` and `CollectionsContractImpl`.
 
 ## Community Feature
 * **Friend Requests:** 0% Ready. Completely mocked.

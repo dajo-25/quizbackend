@@ -523,8 +523,9 @@ class CreateCollectionRequestDTO {
   final String name;
   final String description;
   final bool isPublic;
+  final List<int> questionIds;
 
-  CreateCollectionRequestDTO({required this.name, required this.description, required this.isPublic, });
+  CreateCollectionRequestDTO({required this.name, required this.description, required this.isPublic, required this.questionIds, });
 
   factory CreateCollectionRequestDTO.fromJson(Map<String, dynamic> json) => _$CreateCollectionRequestDTOFromJson(json);
   Map<String, dynamic> toJson() => _$CreateCollectionRequestDTOToJson(this);
@@ -545,8 +546,9 @@ class UpdateCollectionRequestDTO {
   final String name;
   final String description;
   final bool isPublic;
+  final List<int> questionIds;
 
-  UpdateCollectionRequestDTO({required this.name, required this.description, required this.isPublic, });
+  UpdateCollectionRequestDTO({required this.name, required this.description, required this.isPublic, required this.questionIds, });
 
   factory UpdateCollectionRequestDTO.fromJson(Map<String, dynamic> json) => _$UpdateCollectionRequestDTOFromJson(json);
   Map<String, dynamic> toJson() => _$UpdateCollectionRequestDTOToJson(this);

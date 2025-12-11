@@ -322,7 +322,8 @@ data class CollectionDetailDataDTO(
 data class CreateCollectionRequestDTO(
     val name: String,
     val description: String,
-    val isPublic: Boolean
+    val isPublic: Boolean,
+    val questionIds: List<Int>
 )
 
 @Serializable
@@ -334,7 +335,8 @@ data class IdDataDTO(
 data class UpdateCollectionRequestDTO(
     val name: String,
     val description: String,
-    val isPublic: Boolean
+    val isPublic: Boolean,
+    val questionIds: List<Int>
 )
 
 @Serializable
