@@ -15,7 +15,7 @@ class AuthDomainService(
     private val emailSender: EmailSender
 ) {
 
-    fun signup(email: String, username: String, name: String, surname: String, passwordHash: String): String? {
+    fun signup(email: String, username: String, name: String, surname: String, passwordHash: String, uniqueId: String): String? {
         if (!isValidEmail(email)) return null
         if (usersService.findByEmail(email) != null) return null
 
@@ -23,17 +23,6 @@ class AuthDomainService(
 
         // Send verification email
         sendVerificationEmail(email)
-
-        // Generate token and login immediately
-        // Note: In a real app we might want to wait for verification, but for this task "functional bearer token as in the login" implies immediate login.
-        // We need a uniqueId for the device. Since signup doesn't provide it in the current contract (SignupRequestDTO),
-        // we might have to generate one or reuse a default.
-        // However, LoginRequestDTO requires uniqueId. SignupRequestDTO does NOT have uniqueId.
-        // I'll use a random UUID for the initial device uniqueId for signup,
-        // OR the client should provide it. The contract says SignupRequestDTO has: email, username, name, surname, passwordHash.
-        // It does NOT have uniqueId.
-        // I will generate a random uniqueId for this session.
-        val uniqueId = UUID.randomUUID().toString()
 
         return login(email, passwordHash, uniqueId)
     }

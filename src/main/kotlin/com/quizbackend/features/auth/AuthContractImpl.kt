@@ -23,7 +23,8 @@ class AuthContractImpl(
             body.username ?: "",
             body.name ?: "",
             body.surname ?: "",
-            body.passwordHash ?: ""
+            body.passwordHash ?: "",
+            body.uniqueId ?: ""
         )
         return if (token != null) {
             DTOResponse(true, LoginResponseDTO(token), null)

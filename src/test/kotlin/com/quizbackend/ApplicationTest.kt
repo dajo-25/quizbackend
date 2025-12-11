@@ -32,7 +32,8 @@ class ApplicationTest {
                 username = "testuser_${System.currentTimeMillis()}",
                 name = "Test",
                 surname = "User",
-                passwordHash = "hash123"
+                passwordHash = "hash123",
+                uniqueId = "device_${System.currentTimeMillis()}"
             ))
         }
         println("Signup Status: ${signupResponse.status}")
