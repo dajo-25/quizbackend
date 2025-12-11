@@ -183,7 +183,8 @@ data class SignupRequestDTO(
     val username: String,
     val name: String,
     val surname: String,
-    val passwordHash: String
+    val passwordHash: String,
+    val uniqueId: String
 )
 
 @Serializable

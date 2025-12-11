@@ -1,6 +1,8 @@
 package com.quizbackend.features.auth
 
 import com.quizbackend.contracts.generated.*
+import com.quizbackend.utils.UserContext
+import com.quizbackend.features.users.Users
 
 class AuthContractImpl(
     private val authDomainService: AuthDomainService
@@ -15,27 +17,43 @@ class AuthContractImpl(
         }
     }
 
-    override suspend fun PostSignup(body: SignupRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
-        val success = authDomainService.signup(
+    override suspend fun PostSignup(body: SignupRequestDTO, params: EmptyParamsDTO): DTOResponse<LoginResponseDTO> {
+        val token = authDomainService.signup(
             body.email?.uppercase() ?: "",
             body.username ?: "",
             body.name ?: "",
             body.surname ?: "",
-            body.passwordHash ?: ""
+            body.passwordHash ?: "",
+            body.uniqueId ?: ""
         )
-        return if (success) {
-            DTOResponse(true, GenericResponseDTO(true), null)
+        return if (token != null) {
+            DTOResponse(true, LoginResponseDTO(token), null)
         } else {
-            DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.ACCOUNT_ALREADY_EXISTS, "User already exists"))
+            // It could be invalid email or already exists
+            // For simplicity, we return account already exists or bad request if validation failed.
+            // Since we added validation inside signup, we might want to return different errors, but the current contract implies "Generic" error or specific ones.
+            // I'll stick to a generic error or "ACCOUNT_ALREADY_EXISTS" which is the most common reason for failure here if validation passes on client side.
+            // But if validation failed, it returns null too.
+            DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.ACCOUNT_ALREADY_EXISTS, "User already exists or invalid data"))
         }
     }
 
     override suspend fun PostLogout(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
-        return DTOResponse(true, GenericResponseDTO(true), null)
+        val token = UserContext.getToken()
+        if (token != null) {
+            authDomainService.logout(token)
+            return DTOResponse(true, GenericResponseDTO(true), null)
+        }
+        return DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.UNAUTHORIZED, "Missing token"))
     }
 
     override suspend fun DeleteAccount(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<MessageResponseDTO> {
-        return DTOResponse(true, MessageResponseDTO("Account deleted (simulated)"), null)
+        val userId = UserContext.getUserId()
+        if (userId != null) {
+            authDomainService.deleteAccount(userId)
+            return DTOResponse(true, MessageResponseDTO("Account deleted"), null)
+        }
+        return DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.UNAUTHORIZED, "User not found"))
     }
 
     override suspend fun PostRecover(body: RecoverPasswordRequestDTO, params: EmptyParamsDTO): DTOResponse<MessageResponseDTO> {
@@ -57,10 +75,32 @@ class AuthContractImpl(
     }
 
     override suspend fun PostChangePassword(body: ChangePasswordRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO> {
-        return DTOResponse(true, GenericResponseDTO(true), null)
+        val userId = UserContext.getUserId()
+        if (userId != null) {
+            val success = authDomainService.changePassword(userId, body.oldHash ?: "", body.newHash ?: "")
+            if (success) {
+                return DTOResponse(true, GenericResponseDTO(true), null)
+            } else {
+                return DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.INVALID_CREDENTIALS, "Invalid old password"))
+            }
+        }
+        return DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.UNAUTHORIZED, "User not found"))
     }
 
     override suspend fun GetStatus(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<UserStatusResponseDTO> {
-        return DTOResponse(true, UserStatusResponseDTO(UserStatusDataDTO(isVerified = true, mustChangePassword = false)), null)
+        val userId = UserContext.getUserId()
+        if (userId != null) {
+            val user = authDomainService.getUser(userId)
+            if (user != null) {
+                return DTOResponse(true, UserStatusResponseDTO(UserStatusDataDTO(
+                    id = user[Users.id].value,
+                    email = user[Users.email],
+                    username = user[Users.username],
+                    isVerified = user[Users.isVerified],
+                    mustChangePassword = user[Users.mustChangePassword]
+                )), null)
+            }
+        }
+        return DTOResponse(false, null, null, ErrorDetailsDTO(ErrorType.UNAUTHORIZED, "User not found"))
     }
 }
