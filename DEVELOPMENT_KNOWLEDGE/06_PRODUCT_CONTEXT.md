@@ -3,7 +3,7 @@
 This file defines the "Why" and "What" from a user and product perspective. It guides technical decisions by clarifying user needs and intended behaviors.
 
 ## Product Vision
-To provide a comprehensive platform for users to create, manage, and share quiz questions, challenge friends, and track their performance.
+To provide a comprehensive platform for users to create, manage, and share quiz questions, and track their performance.
 
 ## Core Features & Use Cases
 
