@@ -25,15 +25,19 @@ class ApplicationTest {
         }
 
         // Test Signup
+        val email = "unique_test_user_${System.currentTimeMillis()}@example.com"
+        val passwordHash = "hash123"
+        val uniqueId = "device_${System.currentTimeMillis()}"
+
         val signupResponse = client.post("/auth/signup") {
             contentType(ContentType.Application.Json)
             setBody(SignupRequestDTO(
-                email = "unique_test_user_${System.currentTimeMillis()}@example.com",
+                email = email,
                 username = "testuser_${System.currentTimeMillis()}",
                 name = "Test",
                 surname = "User",
-                passwordHash = "hash123",
-                uniqueId = "device_${System.currentTimeMillis()}"
+                passwordHash = passwordHash,
+                uniqueId = uniqueId
             ))
         }
         println("Signup Status: ${signupResponse.status}")
@@ -49,9 +53,9 @@ class ApplicationTest {
         val loginResponse = client.post("/auth/login") {
             contentType(ContentType.Application.Json)
             setBody(LoginRequestDTO(
-                email = "test@example.com",
-                passwordHash = "hash123",
-                uniqueId = "device1"
+                email = email,
+                passwordHash = passwordHash,
+                uniqueId = uniqueId
             ))
         }
         println("Login Status: ${loginResponse.status}")
