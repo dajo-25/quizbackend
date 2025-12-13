@@ -36,6 +36,9 @@ open class GenerateContractTask : DefaultTask() {
 
         // Generate Dart Client
         generateDartClient(projectDir, json)
+
+        // Generate JS Client
+        generateJsClient(projectDir, json)
     }
 
     private fun generateOpenApi(projectDir: File, json: JsonObject) {
@@ -696,5 +699,324 @@ open class GenerateContractTask : DefaultTask() {
         sb.append("}\n")
 
         File(outputDir, "api_client.dart").writeText(sb.toString())
+    }
+
+    // --- JS Client Generation ---
+
+    private fun generateJsClient(projectDir: File, json: JsonObject) {
+        val jsRoot = File(projectDir, "js_client")
+        val contractsDir = File(jsRoot, "contracts")
+        contractsDir.mkdirs()
+
+        val servicesDir = File(contractsDir, "services")
+        servicesDir.mkdirs()
+
+        val enums = json["enums"]?.jsonObject ?: emptyMap()
+        generateJsEnums(contractsDir, enums)
+
+        val dtos = json["dtos"]?.jsonObject ?: emptyMap()
+        generateJsDTOs(contractsDir, dtos)
+
+        val routes = json["routes"]?.jsonArray ?: emptyList()
+        generateJsServices(servicesDir, routes, dtos)
+
+        generateJsClientEntryPoint(contractsDir, routes)
+    }
+
+    private fun generateJsEnums(outputDir: File, enums: Map<String, JsonElement>) {
+        val sb = StringBuilder()
+
+        enums.forEach { (name, element) ->
+            val values = element.jsonObject["values"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+            sb.append("export const $name = {\n")
+            values.forEach { value ->
+                sb.append("  $value: '$value',\n")
+            }
+            sb.append("};\n\n")
+        }
+        File(outputDir, "enums.js").writeText(sb.toString())
+    }
+
+    private fun generateJsDTOs(outputDir: File, dtos: Map<String, JsonElement>) {
+        val sb = StringBuilder()
+        sb.append("import * as Enums from './enums.js';\n\n")
+
+        // Topologically sort DTOs to handle inheritance
+        val sortedDTOs = mutableListOf<String>()
+        val visited = mutableSetOf<String>()
+
+        fun visit(name: String) {
+            if (visited.contains(name)) return
+
+            val dtoObj = dtos[name]?.jsonObject
+            val inherits = dtoObj?.get("inherits")?.jsonPrimitive?.contentOrNull
+            if (inherits != null) {
+                visit(inherits)
+            }
+
+            visited.add(name)
+            sortedDTOs.add(name)
+        }
+
+        dtos.keys.forEach { visit(it) }
+
+        sortedDTOs.forEach { name ->
+            val element = dtos[name]
+            if (element == null) return@forEach // Should not happen given logic
+
+            val dtoObj = element.jsonObject
+            val inherits = dtoObj["inherits"]?.jsonPrimitive?.contentOrNull
+            val properties = dtoObj["properties"]?.jsonArray ?: emptyList()
+
+            val isGeneric = properties.any { it.jsonObject["type"]!!.jsonPrimitive.content == "T" }
+
+            if (inherits != null) {
+                sb.append("export class $name extends $inherits {\n")
+            } else {
+                sb.append("export class $name {\n")
+            }
+
+            // Constructor
+            sb.append("  constructor(data = {}) {\n")
+            if (inherits != null) {
+                sb.append("    super(data);\n")
+            }
+            properties.forEach { prop ->
+                val pName = prop.jsonObject["name"]!!.jsonPrimitive.content
+                 sb.append("    this.$pName = data.$pName;\n")
+            }
+            sb.append("  }\n\n")
+
+            // fromJson
+            sb.append("  static fromJson(json")
+            if (isGeneric) sb.append(", fromJsonT")
+            sb.append(") {\n")
+            sb.append("    if (!json) return null;\n")
+            sb.append("    return new $name({\n")
+
+             if (inherits != null) {
+                sb.append("      ...json,\n")
+             }
+
+            properties.forEach { prop ->
+                 val pName = prop.jsonObject["name"]!!.jsonPrimitive.content
+                 val pType = prop.jsonObject["type"]!!.jsonPrimitive.content
+
+                 sb.append("      $pName: ")
+                 sb.append(generateJsDeserialization(pType, "json.$pName", dtos.keys))
+                 sb.append(",\n")
+            }
+            sb.append("    });\n")
+            sb.append("  }\n\n")
+
+            // toJson
+            sb.append("  toJson(")
+             if (isGeneric) sb.append("toJsonT")
+            sb.append(") {\n")
+            sb.append("    return {\n")
+             if (inherits != null) {
+                sb.append("      ...super.toJson(),\n")
+             }
+            properties.forEach { prop ->
+                val pName = prop.jsonObject["name"]!!.jsonPrimitive.content
+                val pType = prop.jsonObject["type"]!!.jsonPrimitive.content
+                 sb.append("      $pName: ")
+                 sb.append(generateJsSerialization(pType, "this.$pName"))
+                 sb.append(",\n")
+            }
+            sb.append("    };\n")
+            sb.append("  }\n")
+            sb.append("}\n\n")
+        }
+
+        File(outputDir, "dtos.js").writeText(sb.toString())
+    }
+
+    private fun generateJsDeserialization(type: String, valueExpression: String, dtoNames: Set<String>): String {
+        return when {
+            type == "Int" || type == "Long" || type == "Double" || type == "Float" || type == "Boolean" || type == "String" -> valueExpression
+            type == "T" -> "fromJsonT($valueExpression)"
+            type.startsWith("List<") -> {
+                val inner = type.removePrefix("List<").removeSuffix(">")
+                "$valueExpression ? $valueExpression.map(e => ${generateJsDeserialization(inner, "e", dtoNames)}) : []"
+            }
+            dtoNames.contains(type) -> "$type.fromJson($valueExpression)"
+            else -> valueExpression
+        }
+    }
+
+    private fun generateJsSerialization(type: String, valueExpression: String): String {
+        return when {
+            type == "Int" || type == "Long" || type == "Double" || type == "Float" || type == "Boolean" || type == "String" -> valueExpression
+             type == "T" -> "toJsonT($valueExpression)"
+            type.startsWith("List<") -> {
+                val inner = type.removePrefix("List<").removeSuffix(">")
+                "$valueExpression ? $valueExpression.map(e => ${generateJsSerialization(inner, "e")}) : []"
+            }
+             else -> "$valueExpression && $valueExpression.toJson ? $valueExpression.toJson() : $valueExpression"
+        }
+    }
+
+    private fun generateJsServices(outputDir: File, routes: List<JsonElement>, dtos: Map<String, JsonElement>) {
+         val serviceMap = mutableMapOf<String, MutableList<JsonElement>>()
+        routes.forEach { route ->
+            val path = route.jsonObject["path"]!!.jsonPrimitive.content
+            val segments = path.trim('/').split('/')
+            val serviceName = segments.firstOrNull() ?: "root"
+            serviceMap.computeIfAbsent(serviceName) { mutableListOf() }.add(route)
+        }
+
+        serviceMap.forEach { (serviceName, routesList) ->
+            val className = "${serviceName.replaceFirstChar { it.uppercase() }}Service"
+            val sb = StringBuilder()
+
+            val dtoImports = dtos.keys.filter { it != "DTOResponse" }.joinToString(", ")
+            sb.append("import { DTOResponse${if(dtoImports.isNotEmpty()) ", $dtoImports" else ""} } from '../dtos.js';\n")
+            sb.append("import * as Enums from '../enums.js';\n\n")
+
+            sb.append("export class $className {\n")
+            sb.append("  constructor(baseUrl, fetcher) {\n")
+            sb.append("    this.baseUrl = baseUrl;\n")
+            sb.append("    this.fetcher = fetcher;\n")
+            sb.append("  }\n\n")
+
+            routesList.forEach { route ->
+                val r = route.jsonObject
+                val method = r["method"]!!.jsonPrimitive.content
+                val path = r["path"]!!.jsonPrimitive.content
+                val bodyType = r["bodyType"]!!.jsonPrimitive.content
+                val paramsType = r["paramsType"]!!.jsonPrimitive.content
+                val responseType = r["responseType"]!!.jsonPrimitive.content
+                val requiresAuth = r["requiresAuth"]?.jsonPrimitive?.boolean ?: false
+
+                 val segments = path.trim('/').split('/')
+                val lastSegment = segments.last()
+                val isParam = lastSegment.startsWith("{")
+                 val methodNameBuilder = StringBuilder()
+                methodNameBuilder.append(method.lowercase().replaceFirstChar { it.uppercase() })
+
+                fun String.toPascalCase(): String {
+                    return this.split('-', '_').joinToString("") { it.replaceFirstChar { c -> c.uppercase() } }
+                }
+
+                if (isParam) {
+                    if (segments.size > 1) {
+                        val prev = segments[segments.size - 2]
+                        methodNameBuilder.append(prev.toPascalCase())
+                    }
+                    val paramName = lastSegment.trim('{', '}')
+                    methodNameBuilder.append(paramName.toPascalCase())
+                } else {
+                    methodNameBuilder.append(lastSegment.toPascalCase())
+                }
+                val methodName = methodNameBuilder.toString().replaceFirstChar { it.lowercase() }
+
+                // Params extraction
+                val paramsDto = dtos[paramsType]?.jsonObject
+                val paramProperties = paramsDto?.get("properties")?.jsonArray ?: emptyList()
+
+                sb.append("  async $methodName({ ")
+
+                if (method in listOf("POST", "PUT", "PATCH", "DELETE") && bodyType != "EmptyRequestDTO") {
+                    sb.append("body, ")
+                }
+                paramProperties.forEach { prop ->
+                    val pName = prop.jsonObject["name"]!!.jsonPrimitive.content
+                    sb.append("$pName, ")
+                }
+                if (requiresAuth) {
+                    sb.append("bearerToken")
+                }
+                sb.append(" } = {}) {\n")
+
+                // Construct URL
+                val pathParams = mutableListOf<String>()
+                val queryParams = mutableListOf<String>()
+
+                paramProperties.forEach { prop ->
+                    val pName = prop.jsonObject["name"]!!.jsonPrimitive.content
+                     if (path.contains("{$pName}")) {
+                         pathParams.add(pName)
+                     } else {
+                         queryParams.add(pName)
+                     }
+                }
+
+                var jsPath = path
+                pathParams.forEach { pName ->
+                    jsPath = jsPath.replace("{$pName}", "\${encodeURIComponent($pName)}")
+                }
+
+                sb.append("    const url = new URL(`\${this.baseUrl}$jsPath`);\n")
+                queryParams.forEach { qParam ->
+                     sb.append("    if ($qParam !== undefined && $qParam !== null) url.searchParams.append('$qParam', $qParam);\n")
+                }
+
+                sb.append("    const headers = { 'Content-Type': 'application/json' };\n")
+                if (requiresAuth) {
+                    sb.append("    if (bearerToken) headers['Authorization'] = `Bearer \${bearerToken}`;\n")
+                }
+
+                sb.append("    const response = await this.fetcher(url.toString(), {\n")
+                sb.append("      method: '$method',\n")
+                sb.append("      headers,\n")
+                if (method in listOf("POST", "PUT", "PATCH", "DELETE") && bodyType != "EmptyRequestDTO") {
+                    sb.append("      body: JSON.stringify(body.toJson())\n")
+                }
+                sb.append("    });\n")
+
+                sb.append("    const json = await response.json();\n")
+                sb.append("    return DTOResponse.fromJson(json, (data) => ")
+                if (responseType == "Unit" || responseType == "Void") {
+                    sb.append("null")
+                } else if (responseType == "T") {
+                    sb.append("data")
+                } else if (responseType.startsWith("List<")) {
+                     val inner = responseType.removePrefix("List<").removeSuffix(">")
+                     if (dtos.containsKey(inner)) {
+                         sb.append("data.map(i => $inner.fromJson(i))")
+                     } else {
+                         sb.append("data")
+                     }
+                } else if (dtos.containsKey(responseType)) {
+                     sb.append("$responseType.fromJson(data)")
+                } else {
+                    sb.append("data")
+                }
+                sb.append(");\n")
+
+                sb.append("  }\n\n")
+            }
+            sb.append("}\n")
+            File(outputDir, "${serviceName}_service.js").writeText(sb.toString())
+        }
+    }
+
+    private fun generateJsClientEntryPoint(outputDir: File, routes: List<JsonElement>) {
+        val serviceNames = routes.map {
+            val path = it.jsonObject["path"]!!.jsonPrimitive.content
+            val segments = path.trim('/').split('/')
+            segments.firstOrNull() ?: "root"
+        }.distinct()
+
+        val sb = StringBuilder()
+        serviceNames.forEach {
+             sb.append("import { ${it.replaceFirstChar { c -> c.uppercase() }}Service } from './services/${it}_service.js';\n")
+        }
+        sb.append("\n")
+
+        sb.append("export class ApiClient {\n")
+        sb.append("  constructor({ baseUrl, fetcher } = {}) {\n")
+        sb.append("    this.baseUrl = baseUrl || '';\n")
+        sb.append("    this.fetcher = fetcher || fetch;\n")
+
+        serviceNames.forEach {
+             val className = "${it.replaceFirstChar { c -> c.uppercase() }}Service"
+             sb.append("    this.${it}Service = new $className(this.baseUrl, this.fetcher);\n")
+        }
+        sb.append("  }\n")
+        sb.append("}\n")
+
+        File(outputDir, "api_client.js").writeText(sb.toString())
     }
 }
