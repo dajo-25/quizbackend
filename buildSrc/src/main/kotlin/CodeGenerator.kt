@@ -484,17 +484,21 @@ open class GenerateContractTask : DefaultTask() {
             sb.append("\n")
 
             // Constructor
-            sb.append("  $className({")
-            properties.forEach { prop ->
-                 val pName = prop.jsonObject["name"]!!.jsonPrimitive.content
-                 val isNullable = prop.jsonObject["isNullable"]?.jsonPrimitive?.boolean == true
-                 if (!isNullable) {
-                     sb.append("required this.$pName, ")
-                 } else {
-                     sb.append("this.$pName, ")
-                 }
+            sb.append("  $name(")
+            if (properties.isNotEmpty()) {
+                sb.append("{")
+                properties.forEach { prop ->
+                    val pName = prop.jsonObject["name"]!!.jsonPrimitive.content
+                    val isNullable = prop.jsonObject["isNullable"]?.jsonPrimitive?.boolean == true
+                    if (!isNullable) {
+                        sb.append("required this.$pName, ")
+                    } else {
+                        sb.append("this.$pName, ")
+                    }
+                }
+                sb.append("}")
             }
-            sb.append("});\n\n")
+            sb.append(");\n\n")
 
             // Factory
             if (isGeneric) {

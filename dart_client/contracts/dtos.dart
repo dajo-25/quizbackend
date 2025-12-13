@@ -6,7 +6,7 @@ part 'dtos.g.dart';
 @JsonSerializable()
 class DTOParams {
 
-  DTOParams({});
+  DTOParams();
 
   factory DTOParams.fromJson(Map<String, dynamic> json) => _$DTOParamsFromJson(json);
   Map<String, dynamic> toJson() => _$DTOParamsToJson(this);
@@ -15,7 +15,7 @@ class DTOParams {
 @JsonSerializable()
 class EmptyParamsDTO extends DTOParams {
 
-  EmptyParamsDTO({});
+  EmptyParamsDTO();
 
   factory EmptyParamsDTO.fromJson(Map<String, dynamic> json) => _$EmptyParamsDTOFromJson(json);
   Map<String, dynamic> toJson() => _$EmptyParamsDTOToJson(this);
@@ -91,7 +91,7 @@ class DTOResponse<T> {
   final String? message;
   final ErrorDetailsDTO? error;
 
-  DTOResponse<T>({required this.success, this.data, this.message, this.error, });
+  DTOResponse({required this.success, this.data, this.message, this.error, });
 
   factory DTOResponse.fromJson(Map<String, dynamic> json, T Function(Object? json) fromJsonT) => _$DTOResponseFromJson(json, fromJsonT);
   Map<String, dynamic> toJson(Object? Function(T value) toJsonT) => _$DTOResponseToJson(this, toJsonT);
@@ -100,7 +100,7 @@ class DTOResponse<T> {
 @JsonSerializable()
 class EmptyRequestDTO {
 
-  EmptyRequestDTO({});
+  EmptyRequestDTO();
 
   factory EmptyRequestDTO.fromJson(Map<String, dynamic> json) => _$EmptyRequestDTOFromJson(json);
   Map<String, dynamic> toJson() => _$EmptyRequestDTOToJson(this);
