@@ -1,20 +1,20 @@
 import 'package:dio/dio.dart';
-import 'src/services/auth_service.dart';
-import 'src/services/questions_service.dart';
-import 'src/services/collections_service.dart';
-import 'src/services/communities_service.dart';
-import 'src/services/marks_service.dart';
-import 'src/services/devices_service.dart';
-import 'src/services/profile_service.dart';
-export 'src/dtos.dart';
-export 'src/enums.dart';
-export 'src/services/auth_service.dart';
-export 'src/services/questions_service.dart';
-export 'src/services/collections_service.dart';
-export 'src/services/communities_service.dart';
-export 'src/services/marks_service.dart';
-export 'src/services/devices_service.dart';
-export 'src/services/profile_service.dart';
+import 'services/auth_service.dart';
+import 'services/questions_service.dart';
+import 'services/collections_service.dart';
+import 'services/communities_service.dart';
+import 'services/marks_service.dart';
+import 'services/devices_service.dart';
+import 'services/profile_service.dart';
+export 'dtos.dart';
+export 'enums.dart';
+export 'services/auth_service.dart';
+export 'services/questions_service.dart';
+export 'services/collections_service.dart';
+export 'services/communities_service.dart';
+export 'services/marks_service.dart';
+export 'services/devices_service.dart';
+export 'services/profile_service.dart';
 
 class ApiClient {
   final Dio dio;
