@@ -33,7 +33,8 @@ interface CollectionsService {
 
 interface CommunitiesService {
     suspend fun PostFriendRequest(body: SendFriendRequestDTO, params: EmptyParamsDTO): DTOResponse<FriendRequestResponseDTO>
-    suspend fun PostRespond(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO>
+    suspend fun PostRespond(body: RespondFriendRequestRequestDTO, params: EmptyParamsDTO): DTOResponse<GenericResponseDTO>
+    suspend fun GetFriendRequests(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<FriendRequestListResponseDTO>
     suspend fun GetUsers(body: EmptyRequestDTO, params: EmptyParamsDTO): DTOResponse<UserListResponseDTO>
 }
 

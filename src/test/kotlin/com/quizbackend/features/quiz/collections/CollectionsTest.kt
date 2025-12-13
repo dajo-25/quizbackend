@@ -57,8 +57,6 @@ class CollectionsTest {
     private fun createQuestion(text: String): Int {
          return transaction {
             Questions.insertAndGetId {
-                it[Questions.possibleAnswersIds] = ""
-                it[Questions.correctAnswers] = ""
                 it[Questions.creatorId] = 1
                 it[Questions.isDiscoverable] = true
             }.value

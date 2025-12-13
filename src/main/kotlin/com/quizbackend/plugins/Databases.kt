@@ -3,6 +3,7 @@ package com.quizbackend.plugins
 import com.quizbackend.features.localizations.models.AnswersLocalizations
 import com.quizbackend.features.localizations.models.QuestionsLocalizations
 import com.quizbackend.features.devices.Devices
+import com.quizbackend.features.communities.FriendRequests
 import com.quizbackend.features.quiz.answers.models.Answers
 import com.quizbackend.features.quiz.collections.models.CollectionAccess
 import com.quizbackend.features.quiz.collections.models.CollectionQuestions
@@ -31,7 +32,8 @@ fun Application.configureDatabases(jdbcUrl: String = "jdbc:sqlite:quiz.db") {
             Devices,
             Collections,
             CollectionQuestions,
-            CollectionAccess
+            CollectionAccess,
+            FriendRequests
         )
 
         SchemaUtils.create(tables = tables)
